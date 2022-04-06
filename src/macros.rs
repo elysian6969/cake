@@ -1,13 +1,8 @@
-use core::{any, slice, str};
+use core::any;
 
 pub const fn function<T: ?Sized>(function: &T) -> &'static str {
     let full_path = any::type_name_of_val(function);
-    let path = unsafe {
-        str::from_utf8_unchecked(slice::from_raw_parts(
-            full_path.as_ptr(),
-            full_path.len().saturating_sub(10),
-        ))
-    };
+    let path = &full_path[..full_path.len().saturating_sub(10)];
 
     path
 }

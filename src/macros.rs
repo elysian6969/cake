@@ -17,6 +17,19 @@ macro_rules! function {
 }
 
 #[macro_export]
+macro_rules! println {
+    () => {
+        std::println!("{}", $crate::function!())
+    };
+    ($fmt:expr) => {
+        std::println!(core::concat!("{}: ", $fmt), $crate::function!())
+    };
+    ($fmt:expr, $($arg:tt)*) => {
+        std::println!(core::concat!("{}: ", $fmt), $crate::function!(), $($arg)*)
+    };
+}
+
+#[macro_export]
 macro_rules! offset_of {
     ($base:ident.$field:ident) => {{
         let base = core::ptr::addr_of!($base) as *const u8;

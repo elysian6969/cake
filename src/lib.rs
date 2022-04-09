@@ -8,6 +8,11 @@
 #[doc(hidden)]
 pub mod macros;
 
+#[cfg(feature = "tuple")]
 pub mod array;
+
+#[cfg(feature = "tuple")]
 pub mod slice;
+
+#[cfg(feature = "tuple")]
 pub mod tuple;

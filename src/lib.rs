@@ -1,4 +1,5 @@
 #![allow(incomplete_features)]
+#![feature(const_mut_refs)]
 #![feature(const_slice_from_raw_parts)]
 #![feature(const_slice_index)]
 #![feature(const_trait_impl)]

@@ -1,5 +1,6 @@
 use core::any;
 
+/// Returns the path of a function by reference.
 #[doc(hidden)]
 pub const fn function_impl<T: ?Sized>(function: &T) -> &'static str {
     let full_path = any::type_name_of_val(function);

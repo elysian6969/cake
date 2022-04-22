@@ -1,4 +1,5 @@
 #![allow(incomplete_features)]
+#![feature(const_slice_from_raw_parts)]
 #![feature(const_slice_index)]
 #![feature(const_trait_impl)]
 #![feature(const_type_name)]
@@ -8,11 +9,8 @@
 #[doc(hidden)]
 pub mod macros;
 
-#[cfg(feature = "tuple")]
 pub mod array;
-
-#[cfg(feature = "tuple")]
+pub mod ffi;
+pub mod ptr;
 pub mod slice;
-
-#[cfg(feature = "tuple")]
 pub mod tuple;

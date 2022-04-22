@@ -1,21 +1,24 @@
 use core::any;
 
-pub const fn function<T: ?Sized>(function: &T) -> &'static str {
+#[doc(hidden)]
+pub const fn function_impl<T: ?Sized>(function: &T) -> &'static str {
     let full_path = any::type_name_of_val(function);
     let path = &full_path[..full_path.len().saturating_sub(10)];
 
     path
 }
 
+/// Determine the path of the current function.
 #[macro_export]
 macro_rules! function {
     () => {{
         fn function() {}
 
-        $crate::macros::function(&function)
+        $crate::macros::function_impl(&function)
     }};
 }
 
+/// `println!` prefixed with `function!`.
 #[macro_export]
 macro_rules! println {
     () => {
@@ -29,6 +32,7 @@ macro_rules! println {
     };
 }
 
+/// Determine the offset of a field within a structure.
 #[macro_export]
 macro_rules! offset_of {
     ($base:ident.$field:ident) => {{

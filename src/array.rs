@@ -1,10 +1,15 @@
-use crate::tuple::{FromTupleRef, Tuple};
+//! Helper functions and types for arrays.
+
+use crate::ptr;
+use crate::tuple::{Tuple, TupleArray};
 
 mod sealed {
     pub trait Sealed {}
 }
 
+/// An array!
 pub trait Array<T>: sealed::Sealed {
+    /// Explicitly cast to a slice.
     fn as_slice(&self) -> &[T];
 }
 
@@ -16,12 +21,12 @@ impl<T, const N: usize> const Array<T> for [T; N] {
     }
 }
 
-/// Converts a reference to a tuple of `T` to an array with an equivalent length, without copying.
-pub const fn from_tuple_ref<T>(tuple: &T) -> &<T as FromTupleRef>::Output
+/// Convert a tuple of all the same type to an array, without copying.
+#[inline]
+pub const fn from_tuple_ref<T>(tuple: &T) -> &[<T as TupleArray>::Element; <T as Tuple>::LEN]
 where
-    T: ~const FromTupleRef,
-    <T as FromTupleRef>::Output: ~const Array<<T as FromTupleRef>::Element>,
+    T: ~const TupleArray,
     [(); <T as Tuple>::LEN]:,
 {
-    <T as FromTupleRef>::from_tuple_ref(tuple)
+    unsafe { ptr::reborrow(T::as_ptr(tuple).cast()) }
 }

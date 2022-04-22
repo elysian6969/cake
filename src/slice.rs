@@ -1,13 +1,13 @@
-use crate::array;
-use crate::array::Array;
-use crate::tuple::{FromTupleRef, Tuple};
+//! Helper functions and types for slices.
 
-/// Converts a reference to a tuple of `T` to an array with an equivalent length, without copying.
-pub const fn from_tuple_ref<T>(tuple: &T) -> &[<T as FromTupleRef>::Element]
+use crate::tuple::TupleArray;
+use core::slice;
+
+/// Convert a typle of all the same type to a slice, without copying.
+#[inline]
+pub const fn from_tuple_ref<T>(tuple: &T) -> &[<T as TupleArray>::Element]
 where
-    T: ~const FromTupleRef,
-    <T as FromTupleRef>::Output: ~const Array<<T as FromTupleRef>::Element>,
-    [(); <T as Tuple>::LEN]:,
+    T: ~const TupleArray,
 {
-    Array::as_slice(array::from_tuple_ref(tuple))
+    unsafe { slice::from_raw_parts(T::as_ptr(tuple), T::LEN) }
 }

@@ -1,3 +1,5 @@
+//! Helper functions and types for tuples.
+
 mod sealed {
     pub trait Sealed {}
 }
@@ -10,12 +12,11 @@ pub trait Tuple: sealed::Sealed {
     fn len(&self) -> usize;
 }
 
-/// Trait behind the magic of `array::from_tuple_ref`.
-pub trait FromTupleRef: Tuple {
+/// Represents a tuple containing elements of the same type.
+pub trait TupleArray: Tuple {
     type Element;
-    type Output;
 
-    fn from_tuple_ref(&self) -> &Self::Output;
+    fn as_ptr(&self) -> *const Self::Element;
 }
 
 macro_rules! impl_tuple {
@@ -40,18 +41,13 @@ macro_rules! impl_tuple {
     };
 }
 
-macro_rules! impl_from_tuple_ref {
+macro_rules! impl_tuple_array {
     ($($element:ident),*) => {
-        impl<T> const FromTupleRef for ($($element),*,)
-            where [(); <Self as Tuple>::LEN]:,
-        {
+        impl<T> const TupleArray for ($($element),*,) {
             type Element = T;
-            type Output = [T; <Self as Tuple>::LEN];
 
-            fn from_tuple_ref(&self) -> &Self::Output {
-                unsafe {
-                    &*(self as *const Self as *const Self::Output)
-                }
+            fn as_ptr(&self) -> *const T {
+                self as *const Self as *const T
             }
         }
     };
@@ -74,19 +70,37 @@ impl_tuple!(A, B, C, D, E, F, G, H, I, J, K, L, M, N; ?N; 14);
 impl_tuple!(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O; ?O; 15);
 impl_tuple!(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P; ?P; 16);
 
-impl_from_tuple_ref!(T);
-impl_from_tuple_ref!(T, T);
-impl_from_tuple_ref!(T, T, T);
-impl_from_tuple_ref!(T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T, T, T, T, T, T, T, T);
-impl_from_tuple_ref!(T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T);
+impl_tuple_array!(T);
+impl_tuple_array!(T, T);
+impl_tuple_array!(T, T, T);
+impl_tuple_array!(T, T, T, T);
+impl_tuple_array!(T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T, T, T, T, T, T, T, T);
+impl_tuple_array!(T, T, T, T, T, T, T, T, T, T, T, T, T, T, T, T);
+
+/// Returns the length of a tuple.
+#[inline]
+pub const fn len<T>() -> usize
+where
+    T: ~const Tuple,
+{
+    T::LEN
+}
+
+/// Returns the length of a tuple, by reference.
+#[inline]
+pub const fn len_ref<T>(_tuple: &T) -> usize
+where
+    T: ~const Tuple,
+{
+    T::LEN
+}

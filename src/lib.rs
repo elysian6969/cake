@@ -12,6 +12,7 @@ pub mod macros;
 
 pub mod array;
 pub mod ffi;
+pub mod mem;
 pub mod ptr;
 pub mod slice;
 pub mod tuple;

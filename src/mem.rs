@@ -8,7 +8,10 @@ use core::mem;
 ///
 /// Caller must ensure `T` is valid for `'b`.
 #[inline]
-pub const unsafe fn change_lifetime<'a, 'b, T>(a: &'a T) -> &'b T {
+pub const unsafe fn change_lifetime<'a, 'b, T>(a: &'a T) -> &'b T
+where
+    T: ?Sized,
+{
     mem::transmute(a)
 }
 
@@ -18,6 +21,9 @@ pub const unsafe fn change_lifetime<'a, 'b, T>(a: &'a T) -> &'b T {
 ///
 /// Caller must ensure `T` is valid for `'b`.
 #[inline]
-pub const unsafe fn change_lifetime_mut<'a, 'b, T>(a: &'a T) -> &'b T {
+pub const unsafe fn change_lifetime_mut<'a, 'b, T>(a: &'a T) -> &'b T
+where
+    T: ?Sized,
+{
     mem::transmute(a)
 }

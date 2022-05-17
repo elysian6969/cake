@@ -3,6 +3,9 @@
 /// Application binary interface.
 pub mod abi;
 
+/// Virtual table utilities.
+pub mod vtable;
+
 mod sealed {
     pub trait Sealed: Sized {}
 }
@@ -12,6 +15,7 @@ pub trait Signature: sealed::Sealed {
     type Args;
     type Output;
 
+    fn as_ptr(self) -> *const ();
     unsafe fn call(self, args: Self::Args) -> Self::Output;
 }
 
@@ -32,6 +36,89 @@ impl<T, Args, Output> RustSignature for T where
 
 impl<T, Args, Output> CSignature for T where T: abi::C + Signature<Args = Args, Output = Output> {}
 
+use core::arch::asm;
+
+pub trait SysVSignature {
+    type Args;
+    type Output;
+
+    unsafe fn call(self, id: usize, args: Self::Args) -> Self::Output;
+}
+
+pub trait Register {
+    unsafe fn to_register(self) -> usize;
+}
+
+macro_rules! def_register {
+    ($ident:ident) => {
+        impl Register for $ident {
+            unsafe fn to_register(self) -> usize {
+                self as usize
+            }
+        }
+    };
+}
+
+def_register!(i64);
+
+impl<T> Register for *const T {
+    unsafe fn to_register(self) -> usize {
+        self as usize
+    }
+}
+impl<T> Register for *mut T {
+    unsafe fn to_register(self) -> usize {
+        self as usize
+    }
+}
+
+impl<T> Register for T
+where
+    T: Signature,
+{
+    unsafe fn to_register(self) -> usize {
+        self.as_ptr() as usize
+    }
+}
+
+impl SysVSignature for fn(usize) {
+    type Args = ();
+    type Output = usize;
+
+    unsafe fn call(self, id: usize, _args: Self::Args) -> Self::Output {
+        let result: usize;
+
+        asm!(
+            "syscall",
+            inlateout("rax") id => result,
+            options(nostack),
+        );
+
+        result
+    }
+}
+
+impl<A> SysVSignature for fn(usize, A)
+where
+    A: Register,
+{
+    type Args = (A,);
+    type Output = usize;
+
+    unsafe fn call(self, id: usize, args: Self::Args) -> Self::Output {
+        let result: usize;
+
+        asm!(
+            "syscall",
+            inlateout("rax") id => result,
+            in("rdi") args.0.to_register(),
+            options(nostack),
+        );
+
+        result
+    }
+}
+
 macro_rules! impl_fn {
     ($($arg:ident,)*) => {
         // rust functions
@@ -40,6 +127,10 @@ macro_rules! impl_fn {
         impl<$($arg,)* Output> Signature for fn($($arg,)*) -> Output {
             type Args = ($($arg,)*);
             type Output = Output;
+
+            fn as_ptr(self) -> *const () {
+                self as usize as *const ()
+            }
 
             #[allow(non_snake_case)]
             #[inline]
@@ -60,6 +151,10 @@ macro_rules! impl_fn {
             type Args = ($($arg,)*);
             type Output = Output;
 
+            fn as_ptr(self) -> *const () {
+                self as usize as *const ()
+            }
+
             #[allow(non_snake_case)]
             #[inline]
             unsafe fn call(self, args: Self::Args) -> Self::Output {
@@ -78,6 +173,10 @@ macro_rules! impl_fn {
         impl<$($arg,)* Output> Signature for unsafe extern "C" fn($($arg,)*) -> Output {
             type Args = ($($arg,)*);
             type Output = Output;
+
+            fn as_ptr(self) -> *const () {
+                self as usize as *const ()
+            }
 
             #[allow(non_snake_case)]
             #[inline]

@@ -6,6 +6,7 @@ pub mod abi;
 /// Virtual table utilities.
 pub mod vtable;
 
+#[cfg(target_arch = "x86_64")]
 pub mod sysv;
 
 mod sealed {

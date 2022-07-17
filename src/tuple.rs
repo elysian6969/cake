@@ -61,7 +61,7 @@ impl_tuple!(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P,; ?P; 16);
 #[inline]
 pub const fn len<T>() -> usize
 where
-    T: ~const Tuple,
+    T: Tuple,
 {
     T::LEN
 }
@@ -70,7 +70,7 @@ where
 #[inline]
 pub const fn len_ref<T>(tuple: &T) -> usize
 where
-    T: ~const Tuple,
+    T: Tuple,
 {
     // hush!
     let _tuple = tuple;

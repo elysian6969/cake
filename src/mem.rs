@@ -1,11 +1,11 @@
 //! Functions for dealing with memory.
 
+use core::mem::ManuallyDrop;
 use core::{mem, ptr};
 
 pub use uninit::MaybeUninitArray;
 
 mod uninit;
-
 
 /// Reinterprets the bits of a value of one type as another type.
 ///
@@ -13,20 +13,17 @@ mod uninit;
 ///
 /// Only difference is this is usable in generic contexts.
 pub const unsafe fn transmute<T, U>(value: T) -> U {
-    let new_value = mem::transmute_copy(&value);
+    let value = ManuallyDrop::new(value);
 
-    mem::forget(value);
-
-    new_value
+    mem::transmute_copy(&value)
 }
 
 /// Reinterprets the bits of an array as another array.
-/// 
+///
 /// Everything from [`core::mem::transmute`](core::mem::transmute) applies.
 pub const unsafe fn transmute_array<T, U, const N: usize>(array: [T; N]) -> [U; N] {
     transmute(array)
 }
-
 
 /// Interprets `src` as having type `&U`, and then reads `src` without
 /// moving the contained value.

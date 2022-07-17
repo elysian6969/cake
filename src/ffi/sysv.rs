@@ -1,5 +1,6 @@
 use super::Signature;
 
+#[allow(dead_code)]
 #[path = "sysv/x86_64.rs"]
 mod sys;
 

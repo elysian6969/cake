@@ -6,13 +6,12 @@ pub use uninit::MaybeUninitArray;
 
 mod uninit;
 
-pub const unsafe fn transmute_array<T, U, const N: usize>(array: [T; N]) -> [U; N] {
-    transmute(array)
-}
 
-/// Less strict transmute!
+/// Reinterprets the bits of a value of one type as another type.
 ///
-/// No compiler checks, no valid value checks, nothing.
+/// Everything from [`core::mem::transmute`](core::mem::transmute) applies.
+///
+/// Only difference is this is usable in generic contexts.
 pub const unsafe fn transmute<T, U>(value: T) -> U {
     let new_value = mem::transmute_copy(&value);
 
@@ -21,13 +20,22 @@ pub const unsafe fn transmute<T, U>(value: T) -> U {
     new_value
 }
 
+/// Reinterprets the bits of an array as another array.
+/// 
+/// Everything from [`core::mem::transmute`](core::mem::transmute) applies.
+pub const unsafe fn transmute_array<T, U, const N: usize>(array: [T; N]) -> [U; N] {
+    transmute(array)
+}
+
+
 /// Interprets `src` as having type `&U`, and then reads `src` without
 /// moving the contained value.
 ///
-/// Differences to `core::mem::transmute_copy`:
+/// Differences to [`core::mem::transmute_copy`](core::mem::transmute_copy)
 ///
-/// - Accepts an unsized `T`.
-/// - Will return `None` if `U` is larger than `T`.
+/// - No `Sized` constraint on `T`.
+/// - Ensures [undefined behaviour](https://doc.rust-lang.org/nightly/reference/behavior-considered-undefined.html)
+///   isn't trigged by `U` being larger than `T`.
 ///
 pub const unsafe fn transmute_copy<T, U>(src: &T) -> Option<U>
 where

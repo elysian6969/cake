@@ -21,7 +21,7 @@ macro_rules! function {
 
 /// `println!` prefixed with `function!`.
 #[macro_export]
-macro_rules! println {
+macro_rules! fprintln {
     () => {
         std::println!("{}", $crate::function!())
     };

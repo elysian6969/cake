@@ -2,7 +2,8 @@ use crate::{array, mem};
 use core::mem::MaybeUninit;
 use core::ops;
 
-/// `[MaybeUninit<T>; N]` wrapper
+/// A wrapper around `[MaybeUninit<T>; N]`.
+#[repr(transparent)]
 pub struct MaybeUninitArray<T, const N: usize> {
     array: [MaybeUninit<T>; N],
 }

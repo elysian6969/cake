@@ -20,6 +20,7 @@
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(maybe_uninit_uninit_array)]
 #![feature(type_name_of_val)]
+#![no_std]
 
 #[doc(hidden)]
 pub mod macros;

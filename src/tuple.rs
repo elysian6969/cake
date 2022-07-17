@@ -59,19 +59,13 @@ impl_tuple!(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P,; ?P; 16);
 
 /// Returns the length of a tuple.
 #[inline]
-pub const fn len<T>() -> usize
-where
-    T: Tuple,
-{
+pub const fn len<T: Tuple>() -> usize {
     T::LEN
 }
 
 /// Returns the length of a tuple, by reference.
 #[inline]
-pub const fn len_ref<T>(tuple: &T) -> usize
-where
-    T: Tuple,
-{
+pub const fn len_ref<T: Tuple>(tuple: &T) -> usize {
     // hush!
     let _tuple = tuple;
 

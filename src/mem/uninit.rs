@@ -1,6 +1,6 @@
-use crate::array;
+use crate::{array, mem};
 use core::mem::MaybeUninit;
-use core::{mem, ops};
+use core::ops;
 
 /// `[MaybeUninit<T>; N]` wrapper
 pub struct MaybeUninitArray<T, const N: usize> {
@@ -48,7 +48,7 @@ impl<T, const N: usize> MaybeUninitArray<T, N> {
         let array = MaybeUninitArray::each_ref(array);
 
         // SAFETY: MaybeUninit is repr(transparent)
-        unsafe { mem::transmute_copy(&array) }
+        unsafe { mem::transmute_array(array) }
     }
 
     #[inline]
@@ -56,7 +56,7 @@ impl<T, const N: usize> MaybeUninitArray<T, N> {
         let array = MaybeUninitArray::each_mut(array);
 
         // SAFETY: MaybeUninit is repr(transparent)
-        unsafe { mem::transmute_copy(&array) }
+        unsafe { mem::transmute_array(array) }
     }
 }
 

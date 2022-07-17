@@ -7,11 +7,18 @@ pub use uninit::MaybeUninitArray;
 mod uninit;
 
 pub const unsafe fn transmute_array<T, U, const N: usize>(array: [T; N]) -> [U; N] {
-    let new_array = mem::transmute_copy(&array);
+    transmute(array)
+}
 
-    mem::forget(array);
+/// Less strict transmute!
+///
+/// No compiler checks, no valid value checks, nothing.
+pub const unsafe fn transmute<T, U>(value: T) -> U {
+    let new_value = mem::transmute_copy(&value);
 
-    new_array
+    mem::forget(value);
+
+    new_value
 }
 
 /// Interprets `src` as having type `&U`, and then reads `src` without

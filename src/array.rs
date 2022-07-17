@@ -1,7 +1,7 @@
 //! Helper functions and types for arrays.
 
+use crate::mem;
 use crate::tuple::{Tuple, TupleArray};
-use core::mem;
 use core::mem::MaybeUninit;
 
 #[inline]
@@ -10,11 +10,8 @@ where
     T: ~const TupleArray,
     [(); <T as Tuple>::LEN]:,
 {
-    let array = unsafe { mem::transmute_copy(&tuple) };
-
-    mem::forget(tuple);
-
-    array
+    // SAFETY: trait bounds ensure this is valid
+    unsafe { mem::transmute(tuple) }
 }
 
 #[inline]
@@ -90,18 +87,10 @@ pub const fn each_mut<T, const N: usize>(array: &mut [T; N]) -> [&mut T; N] {
 
 #[inline]
 pub const fn each_as_ptr<T, const N: usize>(array: [&T; N]) -> [*const T; N] {
-    let new_array = unsafe { mem::transmute_copy(&array) };
-
-    mem::forget(array);
-
-    new_array
+    unsafe { mem::transmute_array(array) }
 }
 
 #[inline]
 pub const fn each_as_mut_ptr<T, const N: usize>(array: [&mut T; N]) -> [*mut T; N] {
-    let new_array = unsafe { mem::transmute_copy(&array) };
-
-    mem::forget(array);
-
-    new_array
+    unsafe { mem::transmute_array(array) }
 }

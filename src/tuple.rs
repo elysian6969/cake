@@ -68,10 +68,13 @@ where
 
 /// Returns the length of a tuple, by reference.
 #[inline]
-pub const fn len_ref<T>(_tuple: &T) -> usize
+pub const fn len_ref<T>(tuple: &T) -> usize
 where
     T: ~const Tuple,
 {
+    // hush!
+    let _tuple = tuple;
+
     T::LEN
 }
 

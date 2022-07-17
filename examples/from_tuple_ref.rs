@@ -1,4 +1,4 @@
-use frosting::{array, slice};
+use cake::{array, slice};
 
 fn main() {
     let tuple = ("hi", "world");

@@ -1,5 +1,5 @@
-use frosting::tuple;
-use frosting::tuple::TupleIndex;
+use cake::tuple;
+use cake::tuple::TupleIndex;
 
 fn foo<T>(tuple: T)
 where

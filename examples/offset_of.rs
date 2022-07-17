@@ -1,7 +1,6 @@
-#![allow(dead_code)]
+use cake::offset_of;
 
-use frosting::offset_of;
-
+#[allow(dead_code)]
 #[repr(packed)]
 pub struct Foo {
     foo: bool,

@@ -1,5 +1,5 @@
-use frosting::ffi::{abi, CSignature, Signature};
-use frosting::tuple::TupleArray;
+use cake::ffi::{abi, CSignature, Signature};
+use cake::tuple::TupleArray;
 
 fn run_callback<C>(callback: C)
 where

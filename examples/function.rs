@@ -1,6 +1,6 @@
 fn main() {
-    println!("{:?}", frosting::function!());
+    println!("{:?}", cake::function!());
 
-    frosting::println!("hi");
-    frosting::println!("{}", "hi");
+    cake::println!("hi");
+    cake::println!("{}", "hi");
 }

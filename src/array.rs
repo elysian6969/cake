@@ -10,8 +10,8 @@ where
     T: ~const TupleArray,
     [(); <T as Tuple>::LEN]:,
 {
-    // SAFETY: trait bounds ensure this is valid
-    unsafe { mem::transmute(tuple) }
+    // SAFETY: trait bounds ensure this is never invalid
+    unsafe { mem::transmute_unchecked(tuple) }
 }
 
 #[inline]

@@ -34,6 +34,14 @@ impl<T, const N: usize> MaybeUninitArray<T, N> {
         MaybeUninit::array_assume_init(array.array)
     }
 
+    /// # Safety
+    ///
+    /// see Maybeuninit
+    #[inline]
+    pub const unsafe fn assume_init_ref(array: &Self) -> &[T; N] {
+        mem::transmute_unchecked(array)
+    }
+
     #[inline]
     pub const fn each_ref(array: &Self) -> [&MaybeUninit<T>; N] {
         array::each_ref(&array.array)

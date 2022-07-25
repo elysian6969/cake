@@ -135,7 +135,6 @@ where
 {
     let t = Layout::from_val_raw(value);
     let u = Layout::new::<U>();
-
     let value = value as *const T as *const U;
 
     // copy optimization

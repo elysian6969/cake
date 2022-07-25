@@ -26,44 +26,60 @@ impl<T, const N: usize> UninitArray<T, N> {
         self.array.as_mut_ptr().cast()
     }
 
-    /// # Safety
-    ///
-    /// see Maybeuninit
+    /// Extracts the values from an array of MaybeUninit containers.
     #[inline]
     pub const unsafe fn assume_init(array: Self) -> [T; N] {
         MaybeUninit::array_assume_init(array.array)
     }
 
-    /// # Safety
-    ///
-    /// see Maybeuninit
+    /// Assuming all the elements are initialized, get an array reference to them.
     #[inline]
     pub const unsafe fn assume_init_ref(array: &Self) -> &[T; N] {
-        mem::transmute_unchecked(array)
+        // SAFETY: UninitArray is repr(transparent)
+        unsafe { &*(array as *const Self as *const [T; N]) }
     }
 
+    /// Assuming all the elements are initialized, get a mutable array reference to them.
+    #[inline]
+    pub const unsafe fn assume_init_mut(array: &mut Self) -> &mut [T; N] {
+        // SAFETY: UninitArray is repr(transparent)
+        unsafe { &mut *(array as *mut Self as *mut [T; N]) }
+    }
+
+    /// Borrows each element and returns an array of references with the same size as `self`.
+    ///
+    /// Equivalent to `array::each_ref` on the underlying `[MaybeUninit<T>; N]`.
     #[inline]
     pub const fn each_ref(array: &Self) -> [&MaybeUninit<T>; N] {
+        // NOTE: this turns an array of elements into an array of references
         array::each_ref(&array.array)
     }
 
+    /// Borrows each element mutably and returns an array of references with the same size as `self`.
+    ///
+    /// Equivalent to `array::each_mut` on the underlying `[MaybeUninit<T>; N]`.
     #[inline]
     pub const fn each_mut(array: &mut Self) -> [&mut MaybeUninit<T>; N] {
+        // NOTE: this turns an array of elements into an array of references
         array::each_mut(&mut array.array)
     }
 
+    /// Borrows each element and returns an array of pointers with the same size as `self`.
     #[inline]
     pub const fn each_ptr(array: &Self) -> [*const T; N] {
         let array = UninitArray::each_ref(array);
 
+        // NOTE: we do a conversion, hence no use of `array::each_ptr`.
         // SAFETY: MaybeUninit is repr(transparent)
         unsafe { mem::transmute_array_unchecked(array) }
     }
 
+    /// Borrows each element mutably and returns an array of pointers with the same size as `self`.
     #[inline]
     pub const fn each_mut_ptr(array: &mut Self) -> [*mut T; N] {
         let array = UninitArray::each_mut(array);
 
+        // NOTE: we do a conversion, hence no use of `array::each_mut_ptr`.
         // SAFETY: MaybeUninit is repr(transparent)
         unsafe { mem::transmute_array_unchecked(array) }
     }

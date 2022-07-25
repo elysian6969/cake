@@ -1,9 +1,8 @@
 use cake::tuple;
-use cake::tuple::TupleIndex;
 
 fn foo<T>(tuple: T)
 where
-    T: TupleIndex<1, Element = bool>,
+    T: tuple::Index<1, Element = bool>,
 {
     println!("foo: {:?}", tuple::get(&tuple));
 }

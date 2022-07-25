@@ -1,7 +1,7 @@
 use cake::mem;
 
 fn foo<'a, 'b: 'a>(foo: &'a str) -> &'b str {
-    unsafe { mem::change_lifetime(foo) }
+    unsafe { mem::transmute_lifetime(foo) }
 }
 
 fn main() {

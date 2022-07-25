@@ -3,8 +3,8 @@
 mod array;
 mod index;
 
-pub use array::TupleArray;
-pub use index::TupleIndex;
+pub use array::Array;
+pub use index::Index;
 
 mod sealed {
     pub trait Sealed {}
@@ -74,18 +74,18 @@ pub const fn len_ref<T: Tuple>(tuple: &T) -> usize {
 
 /// Returns a reference to an element within a tuple at index `N`.
 #[inline]
-pub const fn get<const N: usize, T>(tuple: &T) -> &<T as TupleIndex<N>>::Element
+pub const fn get<const N: usize, T>(tuple: &T) -> &<T as Index<N>>::Element
 where
-    T: ~const TupleIndex<N>,
+    T: ~const Index<N>,
 {
     T::get(tuple)
 }
 
 /// Returns a mutable reference to an element within a tuple at index `N`.
 #[inline]
-pub const fn get_mut<const N: usize, T>(tuple: &mut T) -> &mut <T as TupleIndex<N>>::Element
+pub const fn get_mut<const N: usize, T>(tuple: &mut T) -> &mut <T as Index<N>>::Element
 where
-    T: ~const TupleIndex<N>,
+    T: ~const Index<N>,
 {
     T::get_mut(tuple)
 }

@@ -1,9 +1,9 @@
-//! TupleIndex trait and implementation.
+//! Index trait and implementation.
 
 use super::Tuple;
 
 /// A tuple element, at index `N`.
-pub trait TupleIndex<const N: usize>: Tuple {
+pub trait Index<const N: usize>: Tuple {
     type Element;
 
     const INDEX: usize;
@@ -14,7 +14,7 @@ pub trait TupleIndex<const N: usize>: Tuple {
 
 macro_rules! impl_tuple_index {
     (($($element:ident,)*); $which:ident[$index:literal]; $self:ident.$get:tt) => {
-        impl<$($element,)*> const TupleIndex<$index> for ($($element,)*) {
+        impl<$($element,)*> const Index<$index> for ($($element,)*) {
             type Element = $which;
 
             const INDEX: usize = $index;

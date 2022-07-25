@@ -2,17 +2,39 @@
 
 use crate::traits::{Assert, True};
 use core::mem::ManuallyDrop;
-use core::{mem, ptr};
+use core::ptr;
 
+pub use consts::{CACHE_LINE_SIZE, POINTER_SIZE};
 pub use discrim::{discriminant, enum_from_raw_parts, variant_count};
 pub use layout::Layout;
 pub use uninit::MaybeUninitArray;
 
+mod consts;
 mod discrim;
 mod layout;
 mod uninit;
 
 pub mod page;
+
+#[inline]
+pub const fn is_zero_sized<T>() -> bool {
+    Layout::new::<T>().size() == 0
+}
+
+#[inline]
+pub const fn is_pointer_sized<T>() -> bool {
+    Layout::new::<T>().size() == POINTER_SIZE
+}
+
+#[inline]
+pub const fn is_cache_line_aligned<T>() -> bool {
+    Layout::new::<T>().size() == CACHE_LINE_SIZE
+}
+
+#[inline]
+pub const fn bit_size_of<T>() -> usize {
+    Layout::new::<T>().size().saturating_mul(8)
+}
 
 /// Determines whether `T` could be transmuted to `U`.
 #[inline]
@@ -163,62 +185,4 @@ where
     T: ?Sized,
 {
     &mut *(value as *mut T)
-}
-
-pub const POINTER_SIZE: usize = mem::size_of::<bool>();
-
-// ty https://github.com/crossbeam-rs/crossbeam/blob/master/crossbeam-utils/src/cache_padded.rs
-#[cfg(target_arch = "s390x")]
-pub const CACHE_LINE_ALIGN: usize = 256;
-
-#[cfg(any(
-    target_arch = "aarch64",
-    target_arch = "powerpc64",
-    target_arch = "x86_64",
-))]
-pub const CACHE_LINE_ALIGN: usize = 128;
-
-#[cfg(not(any(
-    target_arch = "aarch64",
-    target_arch = "arm",
-    target_arch = "mips",
-    target_arch = "mips64",
-    target_arch = "powerpc64",
-    target_arch = "riscv64",
-    target_arch = "s390x",
-    target_arch = "x86_64",
-)))]
-pub const CACHE_LINE_ALIGN: usize = 64;
-
-#[cfg(any(
-    target_arch = "arm",
-    target_arch = "mips",
-    target_arch = "mips64",
-    target_arch = "riscv64",
-))]
-pub const CACHE_LINE_ALIGN: usize = 32;
-
-#[inline]
-pub const fn is_zero_sized<T>() -> bool {
-    mem::size_of::<T>() == 0
-}
-
-#[inline]
-pub const fn is_pointer_sized<T>() -> bool {
-    mem::size_of::<T>() == POINTER_SIZE
-}
-
-#[inline]
-pub const fn is_cache_line_aligned<T>() -> bool {
-    mem::align_of::<T>() == CACHE_LINE_ALIGN
-}
-
-#[inline]
-pub const fn bit_size_of<T>() -> usize {
-    mem::size_of::<T>().saturating_mul(8)
-}
-
-#[inline]
-pub const fn as_bytes<T>(value: &T) -> &MaybeUninitArray<u8, { mem::size_of::<T>() }> {
-    unsafe { &*(value as *const T as *const MaybeUninitArray<u8, { mem::size_of::<T>() }>) }
 }

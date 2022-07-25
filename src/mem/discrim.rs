@@ -1,5 +1,5 @@
+use super::{transmute_unchecked, Layout};
 use crate::marker::HasVariants;
-use crate::mem::transmute_unchecked;
 use core::marker::DiscriminantKind;
 use core::{intrinsics, mem};
 
@@ -30,9 +30,11 @@ pub const unsafe fn enum_from_raw_parts<T, V>(
 where
     T: HasVariants,
 {
-    // handle `()` optimizations
-    // e.g. Result<&str, ()> is &str
-    if mem::size_of::<T>() == mem::size_of::<V>() {
+    let t = Layout::new::<T>();
+    let v = Layout::new::<V>();
+
+    // handle single variant optimizations
+    if t == v {
         transmute_unchecked(value)
     } else {
         transmute_unchecked(WithDiscriminant::<T, V> {

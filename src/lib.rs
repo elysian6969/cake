@@ -1,7 +1,7 @@
 #![allow(incomplete_features)]
 #![allow(unsafe_op_in_unsafe_fn)]
 #![allow(unused_unsafe)]
-//#![deny(warnings)]
+#![deny(warnings)]
 #![feature(const_align_of_val)]
 #![feature(const_align_of_val_raw)]
 #![feature(const_discriminant)]

@@ -22,8 +22,27 @@ struct WithDiscriminant<T, V> {
 }
 
 /// Construct an enum variant from a `discriminantor` and `value`.
+///
+/// # Safety
+///
+/// This is incredibly unsafe!
+///
+/// Ensure correct ordering is applied to `value`.
+///
+/// ```rust
+/// #[derive(Debug)]
+/// enum Foo {
+///     A,
+///     B(&'static str),
+///     C(&'static str, bool),
+/// }
+///
+/// let c: Foo = unsafe { mem::enum_from_raw_parts(2, ("hi", true)) };
+///
+/// println!("{c:?}"); // segmentation fault!
+/// ```
 #[inline]
-pub const unsafe fn enum_from_raw_parts<T, V>(
+pub unsafe fn enum_from_raw_parts<T, V>(
     discriminant: <T as DiscriminantKind>::Discriminant,
     value: V,
 ) -> T

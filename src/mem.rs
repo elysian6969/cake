@@ -28,7 +28,7 @@ pub const fn is_pointer_sized<T>() -> bool {
 
 #[inline]
 pub const fn is_cache_line_aligned<T>() -> bool {
-    Layout::new::<T>().size() == CACHE_LINE_SIZE
+    Layout::new::<T>().align() == CACHE_LINE_SIZE
 }
 
 #[inline]

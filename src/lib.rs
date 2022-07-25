@@ -28,6 +28,7 @@
 #![feature(maybe_uninit_uninit_array)]
 #![feature(slice_from_ptr_range)]
 #![feature(specialization)]
+#![feature(strict_provenance)]
 #![feature(type_name_of_val)]
 #![feature(variant_count)]
 #![no_std]

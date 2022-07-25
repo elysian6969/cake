@@ -31,7 +31,7 @@ where
 #[inline]
 pub const fn from_tuple<T>(tuple: T) -> [<T as tuple::Array>::Element; tuple::len::<T>()]
 where
-    T: ~const tuple::Array,
+    T: tuple::Array,
     [(); tuple::len::<T>()]:,
 {
     // SAFETY: Trait bounds ensure this is never invalid.
@@ -42,7 +42,7 @@ where
 #[inline]
 pub const fn from_tuple_ref<T>(tuple: &T) -> &[<T as tuple::Array>::Element; tuple::len::<T>()]
 where
-    T: ~const tuple::Array,
+    T: tuple::Array,
     [(); tuple::len::<T>()]:,
 {
     // SAFETY: Trait bounds ensure this is never invalid.
@@ -55,7 +55,7 @@ pub const fn from_tuple_mut<T>(
     tuple: &mut T,
 ) -> &mut [<T as tuple::Array>::Element; tuple::len::<T>()]
 where
-    T: ~const tuple::Array,
+    T: tuple::Array,
     [(); tuple::len::<T>()]:,
 {
     // SAFETY: Trait bounds ensure this is never invalid.

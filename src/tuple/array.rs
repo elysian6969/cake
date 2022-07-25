@@ -2,7 +2,7 @@
 
 use super::Tuple;
 
-/// Represents a tuple containing elements of the same type.
+/// Marker trait for a contiguous tuple.
 pub trait Array: Tuple {
     type Element;
 }

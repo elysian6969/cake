@@ -7,7 +7,7 @@ use core::slice;
 #[inline]
 pub const fn from_tuple_ref<T>(tuple: &T) -> &[<T as tuple::Array>::Element]
 where
-    T: ~const tuple::Array,
+    T: tuple::Array,
 {
     let address = (tuple as *const T).cast();
     let len = tuple::len::<T>();
@@ -19,7 +19,7 @@ where
 #[inline]
 pub const fn from_tuple_mut<T>(tuple: &mut T) -> &mut [<T as tuple::Array>::Element]
 where
-    T: ~const tuple::Array,
+    T: tuple::Array,
 {
     let address = (tuple as *mut T).cast();
     let len = tuple::len::<T>();

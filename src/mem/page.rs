@@ -8,10 +8,14 @@ pub struct Page([MaybeUninit<u8>; 4096]);
 pub const PAGE_SIZE: usize = 4096;
 pub const PAGE_MASK: usize = !(PAGE_SIZE - 1);
 
+// NOTE: as much as i love const, it's undefined behaviour to
+// do pointer-integer casts in const eval
+#[inline]
 pub fn page_of<T>(ptr: *const T) -> *const Page {
-    (unsafe { core::mem::transmute::<_, usize>(ptr) } & PAGE_MASK) as *const Page
+    ptr.map_addr(|addr| addr & PAGE_MASK).cast()
 }
 
+#[inline]
 pub fn as_page_range<T>(slice: &[T]) -> Range<*const Page> {
     let Range { start, end } = slice.as_ptr_range();
     let page_start = page_of(start).cast::<Page>();
@@ -20,6 +24,7 @@ pub fn as_page_range<T>(slice: &[T]) -> Range<*const Page> {
     page_start..page_end
 }
 
-pub const unsafe fn from_page_range(range: Range<*const Page>) -> &'static [Page] {
+#[inline]
+pub unsafe fn from_page_range(range: Range<*const Page>) -> &'static [Page] {
     slice::from_ptr_range(range)
 }

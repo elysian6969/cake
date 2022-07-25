@@ -42,10 +42,4 @@ fn main() {
     let foo: Result<&str, ()> = unsafe { mem::enum_from_raw_parts(0, "hi") };
 
     println!("{:?}", foo);
-
-    /*enum NoVariants {}
-
-    let foo: Result<NoVariants, _> = unsafe { mem::enum_from_raw_parts(0, ()) };
-
-    println!("{:?}", foo);*/
 }

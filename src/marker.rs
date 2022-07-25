@@ -5,6 +5,8 @@ mod has_variants {
     use crate::traits::{Assert, True};
 
     pub trait Sealed {}
+
+    /// A marker trait for enums that contain variants.
     pub trait HasVariants: Sealed {}
 
     #[inline]

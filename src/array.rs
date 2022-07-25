@@ -87,10 +87,10 @@ pub const fn each_mut<T, const N: usize>(array: &mut [T; N]) -> [&mut T; N] {
 
 #[inline]
 pub const fn each_as_ptr<T, const N: usize>(array: [&T; N]) -> [*const T; N] {
-    unsafe { mem::transmute_array(array) }
+    unsafe { mem::transmute_array_unchecked(array) }
 }
 
 #[inline]
 pub const fn each_as_mut_ptr<T, const N: usize>(array: [&mut T; N]) -> [*mut T; N] {
-    unsafe { mem::transmute_array(array) }
+    unsafe { mem::transmute_array_unchecked(array) }
 }

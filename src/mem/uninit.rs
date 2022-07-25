@@ -1,6 +1,6 @@
 use crate::{array, mem};
 use core::mem::MaybeUninit;
-use core::ops;
+use core::{fmt, ops};
 
 /// A wrapper around `[MaybeUninit<T>; N]`.
 #[repr(transparent)]
@@ -57,7 +57,7 @@ impl<T, const N: usize> MaybeUninitArray<T, N> {
         let array = MaybeUninitArray::each_ref(array);
 
         // SAFETY: MaybeUninit is repr(transparent)
-        unsafe { mem::transmute_array(array) }
+        unsafe { mem::transmute_array_unchecked(array) }
     }
 
     #[inline]
@@ -65,7 +65,7 @@ impl<T, const N: usize> MaybeUninitArray<T, N> {
         let array = MaybeUninitArray::each_mut(array);
 
         // SAFETY: MaybeUninit is repr(transparent)
-        unsafe { mem::transmute_array(array) }
+        unsafe { mem::transmute_array_unchecked(array) }
     }
 }
 
@@ -82,5 +82,12 @@ impl<T, const N: usize> const ops::DerefMut for MaybeUninitArray<T, N> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.array
+    }
+}
+
+impl<T, const N: usize> fmt::Debug for MaybeUninitArray<T, N> {
+    #[inline]
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        fmt::Debug::fmt(&self.array, fmt)
     }
 }

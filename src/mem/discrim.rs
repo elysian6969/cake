@@ -1,6 +1,6 @@
 use crate::marker::HasVariants;
+use crate::mem::transmute_unchecked;
 use core::marker::DiscriminantKind;
-use core::mem::ManuallyDrop;
 use core::{intrinsics, mem};
 
 /// Returns a value uniquely identifying the enum variant in `value`.
@@ -16,9 +16,9 @@ pub const fn variant_count<T>() -> usize {
 }
 
 #[allow(dead_code)]
-struct Enum<T, V> {
+struct WithDiscriminant<T, V> {
     discriminant: <T as DiscriminantKind>::Discriminant,
-    value: ManuallyDrop<V>,
+    value: V,
 }
 
 pub const unsafe fn enum_from_raw_parts<T, V>(
@@ -28,14 +28,12 @@ pub const unsafe fn enum_from_raw_parts<T, V>(
 where
     T: HasVariants,
 {
-    let value = ManuallyDrop::new(value);
-
     // handle `()` optimizations
     // e.g. Result<&str, ()> is &str
     if mem::size_of::<T>() == mem::size_of::<V>() {
-        mem::transmute_copy(&value)
+        transmute_unchecked(value)
     } else {
-        mem::transmute_copy(&Enum::<T, V> {
+        transmute_unchecked(WithDiscriminant::<T, V> {
             discriminant,
             value,
         })

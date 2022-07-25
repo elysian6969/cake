@@ -42,7 +42,7 @@ struct WithDiscriminant<T, V> {
 /// println!("{c:?}"); // segmentation fault!
 /// ```
 #[inline]
-pub unsafe fn enum_from_raw_parts<T, V>(
+pub const unsafe fn enum_from_raw_parts<T, V>(
     discriminant: <T as DiscriminantKind>::Discriminant,
     value: V,
 ) -> T

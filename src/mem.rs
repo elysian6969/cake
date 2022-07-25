@@ -4,14 +4,15 @@ use crate::traits::{Assert, True};
 use core::mem::ManuallyDrop;
 use core::{mem, ptr};
 
-pub use discrim::{discriminant, enum_from_raw_parts, variant_count, HasVariants};
-
+pub use discrim::{discriminant, enum_from_raw_parts, variant_count};
 pub use layout::Layout;
 pub use uninit::MaybeUninitArray;
 
 mod discrim;
 mod layout;
 mod uninit;
+
+pub mod page;
 
 /// Determines whether `T` could be transmuted to `U`.
 #[inline]

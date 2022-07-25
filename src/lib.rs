@@ -13,9 +13,10 @@
 #![feature(const_ptr_offset_from)]
 #![feature(const_ptr_read)]
 #![feature(const_refs_to_cell)]
+#![feature(const_slice_from_ptr_range)]
+#![feature(const_slice_index)]
 #![feature(const_size_of_val)]
 #![feature(const_size_of_val_raw)]
-#![feature(const_slice_index)]
 #![feature(const_trait_impl)]
 #![feature(const_transmute_copy)]
 #![feature(const_type_name)]
@@ -25,6 +26,7 @@
 #![feature(layout_for_ptr)]
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(maybe_uninit_uninit_array)]
+#![feature(slice_from_ptr_range)]
 #![feature(specialization)]
 #![feature(type_name_of_val)]
 #![feature(variant_count)]
@@ -35,6 +37,7 @@ pub mod macros;
 
 pub mod array;
 pub mod ffi;
+pub mod marker;
 pub mod mem;
 pub mod slice;
 pub mod traits;

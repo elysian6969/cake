@@ -35,7 +35,11 @@ fn main() {
 
     println!("{:?}", foo);
 
-    let foo: Result<Foo, _> = unsafe { mem::enum_from_raw_parts(2, "hi") };
+    let foo: Foo = unsafe { mem::enum_from_raw_parts(2, "hi") };
+
+    println!("{:?}", foo);
+
+    let foo: Result<&str, ()> = unsafe { mem::enum_from_raw_parts(0, "hi") };
 
     println!("{:?}", foo);
 

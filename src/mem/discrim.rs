@@ -1,4 +1,4 @@
-use crate::traits::{Assert, True};
+use crate::marker::HasVariants;
 use core::marker::DiscriminantKind;
 use core::mem::ManuallyDrop;
 use core::{intrinsics, mem};
@@ -15,16 +15,6 @@ pub const fn variant_count<T>() -> usize {
     mem::variant_count::<T>()
 }
 
-mod sealed {
-    pub trait Sealed {}
-}
-
-pub trait HasVariants: sealed::Sealed {}
-
-impl<T> sealed::Sealed for T where Assert<{ variant_count::<T>() > 0 }>: True {}
-
-impl<T> HasVariants for T where T: sealed::Sealed {}
-
 #[allow(dead_code)]
 struct Enum<T, V> {
     discriminant: <T as DiscriminantKind>::Discriminant,
@@ -39,10 +29,15 @@ where
     T: HasVariants,
 {
     let value = ManuallyDrop::new(value);
-    let value: T = mem::transmute_copy(&Enum::<T, V> {
-        discriminant,
-        value,
-    });
 
-    value
+    // handle `()` optimizations
+    // e.g. Result<&str, ()> is &str
+    if mem::size_of::<T>() == mem::size_of::<V>() {
+        mem::transmute_copy(&value)
+    } else {
+        mem::transmute_copy(&Enum::<T, V> {
+            discriminant,
+            value,
+        })
+    }
 }

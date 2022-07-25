@@ -7,7 +7,7 @@ use core::ptr;
 pub use consts::{CACHE_LINE_SIZE, POINTER_SIZE};
 pub use discrim::{discriminant, enum_from_raw_parts, variant_count};
 pub use layout::Layout;
-pub use uninit::MaybeUninitArray;
+pub use uninit::UninitArray;
 
 mod consts;
 mod discrim;

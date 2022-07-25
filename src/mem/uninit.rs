@@ -4,11 +4,11 @@ use core::{fmt, ops};
 
 /// A wrapper around `[MaybeUninit<T>; N]`.
 #[repr(transparent)]
-pub struct MaybeUninitArray<T, const N: usize> {
+pub struct UninitArray<T, const N: usize> {
     array: [MaybeUninit<T>; N],
 }
 
-impl<T, const N: usize> MaybeUninitArray<T, N> {
+impl<T, const N: usize> UninitArray<T, N> {
     #[inline]
     pub const fn uninit() -> Self {
         let array = MaybeUninit::uninit_array();
@@ -54,7 +54,7 @@ impl<T, const N: usize> MaybeUninitArray<T, N> {
 
     #[inline]
     pub const fn each_ptr(array: &Self) -> [*const T; N] {
-        let array = MaybeUninitArray::each_ref(array);
+        let array = UninitArray::each_ref(array);
 
         // SAFETY: MaybeUninit is repr(transparent)
         unsafe { mem::transmute_array_unchecked(array) }
@@ -62,14 +62,14 @@ impl<T, const N: usize> MaybeUninitArray<T, N> {
 
     #[inline]
     pub const fn each_mut_ptr(array: &mut Self) -> [*mut T; N] {
-        let array = MaybeUninitArray::each_mut(array);
+        let array = UninitArray::each_mut(array);
 
         // SAFETY: MaybeUninit is repr(transparent)
         unsafe { mem::transmute_array_unchecked(array) }
     }
 }
 
-impl<T, const N: usize> const ops::Deref for MaybeUninitArray<T, N> {
+impl<T, const N: usize> const ops::Deref for UninitArray<T, N> {
     type Target = [MaybeUninit<T>; N];
 
     #[inline]
@@ -78,14 +78,14 @@ impl<T, const N: usize> const ops::Deref for MaybeUninitArray<T, N> {
     }
 }
 
-impl<T, const N: usize> const ops::DerefMut for MaybeUninitArray<T, N> {
+impl<T, const N: usize> const ops::DerefMut for UninitArray<T, N> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.array
     }
 }
 
-impl<T, const N: usize> fmt::Debug for MaybeUninitArray<T, N> {
+impl<T, const N: usize> fmt::Debug for UninitArray<T, N> {
     #[inline]
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         fmt::Debug::fmt(&self.array, fmt)

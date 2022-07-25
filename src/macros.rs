@@ -37,9 +37,9 @@ macro_rules! fprintln {
 #[macro_export]
 macro_rules! offset_of {
     ($base:ident.$field:ident) => {{
-        let base = core::ptr::addr_of!($base) as *const u8;
-        let field = core::ptr::addr_of!($base.$field) as *const u8;
+        let base = core::ptr::addr_of!($base);
+        let field = core::ptr::addr_of!($base.$field);
 
-        unsafe { field.offset_from(base) }
+        unsafe { field.sub_ptr(base) }
     }};
 }

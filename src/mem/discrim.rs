@@ -21,6 +21,8 @@ struct WithDiscriminant<T, V> {
     value: V,
 }
 
+/// Construct an enum variant from a `discriminantor` and `value`.
+#[inline]
 pub const unsafe fn enum_from_raw_parts<T, V>(
     discriminant: <T as DiscriminantKind>::Discriminant,
     value: V,

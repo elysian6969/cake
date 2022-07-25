@@ -1,10 +1,9 @@
 //! Utilities related to FFI bindings.
 
-/// Application binary interface.
-pub mod abi;
+pub use pad::{BytePad, Pad, VTablePad};
 
-/// Virtual table utilities.
-pub mod vtable;
+pub mod abi;
+mod pad;
 
 #[cfg(target_arch = "x86_64")]
 pub mod sysv;

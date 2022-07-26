@@ -119,9 +119,9 @@ pub const fn repeat_u16<T: ~const Int>(bytes: u16) -> T
 where
     Assert<{ Layout::new::<T>().size() >= 2 }>: True,
     [(); Layout::new::<T>().size()]:,
-    [(); Layout::new::<T>().size() * 2]:,
+    [(); Layout::new::<T>().size() / 2]:,
 {
-    let bytes = [bytes; Layout::new::<T>().size() * 2];
+    let bytes = [bytes; Layout::new::<T>().size() / 2];
     let bytes = unsafe { mem::transmute_unchecked(bytes) };
 
     from_ne_bytes(bytes)
@@ -133,9 +133,9 @@ pub const fn repeat_u32<T: ~const Int>(bytes: u32) -> T
 where
     Assert<{ Layout::new::<T>().size() >= 4 }>: True,
     [(); Layout::new::<T>().size()]:,
-    [(); Layout::new::<T>().size() * 4]:,
+    [(); Layout::new::<T>().size() / 4]:,
 {
-    let bytes = [bytes; Layout::new::<T>().size() * 4];
+    let bytes = [bytes; Layout::new::<T>().size() / 4];
     let bytes = unsafe { mem::transmute_unchecked(bytes) };
 
     from_ne_bytes(bytes)
@@ -147,9 +147,9 @@ pub const fn repeat_u64<T: ~const Int>(bytes: u64) -> T
 where
     Assert<{ Layout::new::<T>().size() >= 8 }>: True,
     [(); Layout::new::<T>().size()]:,
-    [(); Layout::new::<T>().size() * 8]:,
+    [(); Layout::new::<T>().size() / 8]:,
 {
-    let bytes = [bytes; Layout::new::<T>().size() * 8];
+    let bytes = [bytes; Layout::new::<T>().size() / 8];
     let bytes = unsafe { mem::transmute_unchecked(bytes) };
 
     from_ne_bytes(bytes)

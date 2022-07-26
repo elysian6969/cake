@@ -28,6 +28,8 @@
 // src/mem/layout
 #![feature(const_align_of_val)]
 #![feature(const_align_of_val_raw)]
+// wait for tomorrow's nightly
+//#![feature(const_cmp)]
 #![feature(const_size_of_val)]
 #![feature(const_size_of_val_raw)]
 #![feature(layout_for_ptr)]
@@ -51,3 +53,4 @@ pub mod mem;
 pub mod slice;
 pub mod traits;
 pub mod tuple;
+pub mod vec;

@@ -54,7 +54,6 @@
 pub mod macros;
 
 pub mod array;
-#[allow(dead_code)]
 pub mod char;
 pub mod compress;
 pub mod ffi;

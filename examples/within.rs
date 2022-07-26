@@ -5,6 +5,7 @@ fn main() {
 
     unsafe {
         slice::copy_within_unchecked(&mut items, 3..=4, 0);
+        slice::copy_within_unchecked(&mut items, 2, 0);
     }
 
     println!("{items:?}");

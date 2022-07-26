@@ -1,5 +1,5 @@
 use super::FixedVec;
-use crate::char::encode_utf8;
+use crate::char::{encode_utf8, next_code_point_reverse};
 use core::{fmt, ops, str};
 
 /// A fixed-capacity string type.
@@ -60,6 +60,22 @@ impl<const N: usize> FixedString<N> {
         let bytes = encode_utf8(character);
 
         self.bytes.extend_from_slice(&bytes);
+    }
+
+    #[inline]
+    pub const fn pop(&mut self) -> Option<char> {
+        if self.is_empty() {
+            None
+        } else {
+            let character = unsafe { next_code_point_reverse(self.as_bytes()) };
+            let character = unsafe { char::from_u32_unchecked(character?) };
+
+            unsafe {
+                self.bytes.set_len(self.len() - character.len_utf8());
+            }
+
+            Some(character)
+        }
     }
 }
 

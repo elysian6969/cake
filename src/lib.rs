@@ -17,7 +17,10 @@
 // src/fixed
 #![feature(const_maybe_uninit_write)]
 // src/fixed/string
+#![feature(const_char_convert)]
+#![feature(const_convert)]
 #![feature(const_str_from_utf8_unchecked_mut)]
+#![feature(const_try)]
 // src/compress
 #![feature(const_pointer_byte_offsets)]
 #![feature(pointer_byte_offsets)]
@@ -51,6 +54,7 @@
 pub mod macros;
 
 pub mod array;
+#[allow(dead_code)]
 pub mod char;
 pub mod compress;
 pub mod ffi;

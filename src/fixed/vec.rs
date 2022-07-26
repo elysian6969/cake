@@ -22,6 +22,11 @@ impl<T, const N: usize> FixedVec<T, N> {
     }
 
     #[inline]
+    pub const unsafe fn set_len(&mut self, new_len: usize) {
+        self.len = new_len;
+    }
+
+    #[inline]
     pub const fn is_empty(&self) -> bool {
         self.len == 0
     }

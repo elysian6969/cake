@@ -24,4 +24,14 @@ fn main() {
 
     println!("{string}");
     println!("{string:?}");
+
+    println!("{:?}", string.pop());
+    println!("{:?}", string.pop());
+    println!("{:?}", string.pop());
+    println!("{:?}", string.pop());
+    println!("{:?}", string.pop());
+    println!("{:?}", string.pop());
+
+    println!("{string}");
+    println!("{string:?}");
 }

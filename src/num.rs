@@ -157,3 +157,11 @@ where
 
     from_ne_bytes(bytes)
 }
+
+const FRACTION: f64 = 1.0;
+
+/// Calculates the root `root` of `value`.
+#[inline]
+pub const fn root(value: i32, root: u32) -> i32 {
+    libm::round(libm::pow(value as f64, FRACTION / root as f64)) as i32
+}

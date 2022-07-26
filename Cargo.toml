@@ -2,3 +2,6 @@
 edition = "2021"
 name = "cake"
 version = "0.0.0"
+
+[dependencies]
+libm = { git = "https://github.com/elysian6969/libm" }

@@ -48,6 +48,8 @@
 #![feature(const_replace)]
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(maybe_uninit_uninit_array)]
+// src/num
+#![feature(const_fn_floating_point_arithmetic)]
 #![no_std]
 
 #[doc(hidden)]

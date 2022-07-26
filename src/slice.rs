@@ -40,11 +40,15 @@ where
     T: Copy,
     I: ~const SliceIndex<[T]>,
 {
+    // `SliceIndex::get_unchecked` always returns a reference
     let src = slice.get_unchecked(src);
-    let src_ptr = src as *const _;
-    let src_len = Layout::from_val_raw(src_ptr).size() / Layout::new::<T>().size();
-    // casting prior to this provides the incorrect length ^
-    let src_ptr = src_ptr as *const T;
+    // compiler should return the correct size (in bytes) based on the type
+    // if `src` is `&T` it should be `size_of::<T>()`
+    // if `src` is `&[T]` it should be `src.len() * size_of::<T>()`
+    let src_len = Layout::from_val(src).size() / Layout::new::<T>().size();
+    // it is safe to cast a slice to a fat pointer then to a regular pointer
+    // fat pointer repr (*const T, usize)
+    let src_ptr = src_ptr as *const _ as *const T;
     let dst_ptr = slice.as_mut_ptr().add(dst);
 
     ptr::copy(src_ptr, dst_ptr, src_len);

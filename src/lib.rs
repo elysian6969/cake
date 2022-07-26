@@ -38,8 +38,11 @@
 // src/mem/uninit
 #![feature(const_maybe_uninit_array_assume_init)]
 #![feature(const_maybe_uninit_uninit_array)]
+#![feature(const_replace)]
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(maybe_uninit_uninit_array)]
+// src/vec
+#![feature(const_maybe_uninit_write)]
 #![no_std]
 
 #[doc(hidden)]
@@ -50,6 +53,7 @@ pub mod compress;
 pub mod ffi;
 pub mod marker;
 pub mod mem;
+pub mod num;
 pub mod slice;
 pub mod traits;
 pub mod tuple;

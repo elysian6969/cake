@@ -1,5 +1,4 @@
 use crate::mem::UninitArray;
-use core::mem::MaybeUninit;
 
 /// A fixed-capacity vector type.
 pub struct FixedVec<T, const N: usize> {
@@ -8,6 +7,7 @@ pub struct FixedVec<T, const N: usize> {
 }
 
 impl<T, const N: usize> FixedVec<T, N> {
+    #[inline]
     pub const fn new() -> Self {
         let array = UninitArray::uninit();
         let len = 0;
@@ -15,28 +15,38 @@ impl<T, const N: usize> FixedVec<T, N> {
         Self { array, len }
     }
 
+    #[inline]
     pub const fn len(&self) -> usize {
         self.len
     }
 
+    #[inline]
     pub const fn is_empty(&self) -> bool {
         self.len == 0
     }
 
-    pub const fn push(&mut self, value: T) -> Result<(), T> {
-        if self.len > N {
-            Err(value)
-        } else {
-            unsafe {
-                self.push_unchecked(value);
-            }
-
-            Ok(())
-        }
+    /// Appends an element to the back of a collection.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the length exceeds `N` elements.
+    #[inline]
+    pub const fn push(&mut self, value: T) {
+        self.array[self.len].write(value);
+        self.len += 1;
     }
 
-    pub const unsafe fn push_unchecked(&mut self, value: T) {
-        self.array[self.len] = MaybeUninit::new(value);
-        self.len += 1;
+    /// Removes the last element from the collection  and returns it, or `None` if it is empty.
+    #[inline]
+    pub const fn pop(&mut self) -> Option<T> {
+        if self.is_empty() {
+            None
+        } else {
+            self.len -= 1;
+
+            let value = unsafe { UninitArray::take_init(&mut self.array, self.len) };
+
+            Some(value)
+        }
     }
 }

@@ -1,4 +1,5 @@
 use crate::{array, mem};
+use core::mem::replace;
 use core::mem::MaybeUninit;
 use core::{fmt, ops};
 
@@ -9,6 +10,8 @@ pub struct UninitArray<T, const N: usize> {
 }
 
 impl<T, const N: usize> UninitArray<T, N> {
+    const UNINIT: MaybeUninit<T> = MaybeUninit::uninit();
+
     #[inline]
     pub const fn uninit() -> Self {
         let array = MaybeUninit::uninit_array();
@@ -82,6 +85,23 @@ impl<T, const N: usize> UninitArray<T, N> {
         // NOTE: we do a conversion, hence no use of `array::each_mut_ptr`.
         // SAFETY: MaybeUninit is repr(transparent)
         unsafe { mem::transmute_array_unchecked(array) }
+    }
+
+    /// Extracts the value at `index`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `index` is greater than `N`.
+    ///
+    /// # Safety
+    ///
+    /// Caller must enaure item at `index` is initialised.
+    #[inline]
+    pub const unsafe fn take_init(array: &mut Self, index: usize) -> T {
+        let value = replace(&mut array.array[index], Self::UNINIT);
+
+        // SAFETY: `index` is checked.
+        unsafe { MaybeUninit::assume_init(value) }
     }
 }
 

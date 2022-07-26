@@ -86,12 +86,12 @@ pub const fn encode_utf8(character: char) -> FixedVec<u8, 4> {
 ///
 /// `bytes` must produce a valid UTF-8-like (UTF-8 or WTF-8) string
 #[inline]
-pub(crate) const unsafe fn next_code_point(bytes: &[u8]) -> Option<u32> {
+pub(crate) const unsafe fn next_code_point(bytes: &[u8]) -> Option<char> {
     // Decode UTF-8
     let x = unsafe { *bytes.get_unchecked(0) };
 
     if x < 128 {
-        return Some(x as u32);
+        return Some(char::from_u32_unchecked(x as u32));
     }
 
     // Multibyte case follows
@@ -126,7 +126,7 @@ pub(crate) const unsafe fn next_code_point(bytes: &[u8]) -> Option<u32> {
         }
     }
 
-    Some(code)
+    Some(char::from_u32_unchecked(code))
 }
 
 /// Reads the last code point out of a byte iterator (assuming a
@@ -136,14 +136,14 @@ pub(crate) const unsafe fn next_code_point(bytes: &[u8]) -> Option<u32> {
 ///
 /// `bytes` must produce a valid UTF-8-like (UTF-8 or WTF-8) string
 #[inline]
-pub(crate) const unsafe fn next_code_point_reverse(bytes: &[u8]) -> Option<u32> {
+pub(crate) const unsafe fn next_code_point_reverse(bytes: &[u8]) -> Option<char> {
     let len = bytes.len().saturating_sub(1);
 
     // Decode UTF-8
     let w = unsafe { *bytes.get_unchecked(len) };
 
     if w < 128 {
-        return Some(w as u32);
+        return Some(char::from_u32_unchecked(w as u32));
     }
 
     // Multibyte case follows
@@ -175,5 +175,5 @@ pub(crate) const unsafe fn next_code_point_reverse(bytes: &[u8]) -> Option<u32> 
 
     code = utf8_acc_cont_byte(code, w);
 
-    Some(code)
+    Some(char::from_u32_unchecked(code))
 }

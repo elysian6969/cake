@@ -34,4 +34,23 @@ fn main() {
 
     println!("string = {string}");
     println!("string = {string:?}");
+
+    string.push('h');
+    string.push('e');
+    string.push('l');
+    string.push('l');
+    string.push('o');
+
+    println!("string = {string}");
+    println!("string = {string:?}");
+
+    println!("{:?}", string.remove(0));
+    println!("{:?}", string.remove(0));
+    println!("{:?}", string.remove(0));
+    println!("{:?}", string.remove(0));
+    println!("{:?}", string.remove(0));
+    println!("{:?}", string.remove(0));
+
+    println!("string = {string}");
+    println!("string = {string:?}");
 }

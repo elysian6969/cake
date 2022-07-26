@@ -34,7 +34,7 @@ impl<'a, T> Slice<'a, T> {
     }
 
     #[inline]
-    pub fn as_slice_mut(&mut self) -> &'a mut [T] {
+    pub fn as_mut_slice(&mut self) -> &'a mut [T] {
         let (address, len) = self.to_parts();
 
         unsafe { slice::from_raw_parts_mut(address, len) }
@@ -63,6 +63,6 @@ impl<'a, T> ops::Deref for Slice<'a, T> {
 impl<'a, T> ops::DerefMut for Slice<'a, T> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_slice_mut()
+        self.as_mut_slice()
     }
 }

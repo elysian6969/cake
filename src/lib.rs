@@ -14,12 +14,16 @@
 #![feature(const_transmute_copy)]
 #![feature(generic_const_exprs)]
 #![feature(slice_from_ptr_range)]
-// src/macros
-#![feature(const_type_name)]
-#![feature(type_name_of_val)]
+// src/fixed
+#![feature(const_maybe_uninit_write)]
+// src/fixed/string
+#![feature(const_str_from_utf8_unchecked_mut)]
 // src/compress
 #![feature(const_pointer_byte_offsets)]
 #![feature(pointer_byte_offsets)]
+// src/macros
+#![feature(const_type_name)]
+#![feature(type_name_of_val)]
 // src/mem/discrim
 #![feature(const_discriminant)]
 #![feature(core_intrinsics)]
@@ -41,20 +45,19 @@
 #![feature(const_replace)]
 #![feature(maybe_uninit_array_assume_init)]
 #![feature(maybe_uninit_uninit_array)]
-// src/vec
-#![feature(const_maybe_uninit_write)]
 #![no_std]
 
 #[doc(hidden)]
 pub mod macros;
 
 pub mod array;
+pub mod char;
 pub mod compress;
 pub mod ffi;
+pub mod fixed;
 pub mod marker;
 pub mod mem;
 pub mod num;
 pub mod slice;
 pub mod traits;
 pub mod tuple;
-pub mod vec;

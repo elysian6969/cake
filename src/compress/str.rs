@@ -21,8 +21,8 @@ impl<'a> Str<'a> {
     }
 
     #[inline]
-    pub fn as_str_mut(&mut self) -> &'a mut str {
-        let bytes = self.bytes.as_slice_mut();
+    pub fn as_mut_str(&mut self) -> &'a mut str {
+        let bytes = self.bytes.as_mut_slice();
 
         unsafe { str::from_utf8_unchecked_mut(bytes) }
     }
@@ -54,6 +54,6 @@ impl<'a> ops::Deref for Str<'a> {
 impl<'a> ops::DerefMut for Str<'a> {
     #[inline]
     fn deref_mut(&mut self) -> &mut Self::Target {
-        self.as_str_mut()
+        self.as_mut_str()
     }
 }

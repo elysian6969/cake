@@ -45,6 +45,7 @@ mod int {
             $(
                 impl Sealed for $ident {}
                 impl const Int for $ident {
+                    #[inline]
                     fn _cake_from_be_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self
                     where
                         [(); Layout::new::<Self>().size()]:,
@@ -52,6 +53,7 @@ mod int {
                         Self::from_be_bytes(bytes)
                     }
 
+                    #[inline]
                     fn _cake_from_le_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self
                     where
                         [(); Layout::new::<Self>().size()]:,
@@ -59,6 +61,7 @@ mod int {
                         Self::from_le_bytes(bytes)
                     }
 
+                    #[inline]
                     fn _cake_from_ne_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self
                     where
                         [(); Layout::new::<Self>().size()]:,

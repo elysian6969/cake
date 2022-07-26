@@ -1,6 +1,10 @@
 use crate::fixed::FixedVec;
 use core::hint;
 
+// based on
+// next_code_point: https://raw.githubusercontent.com/rust-lang/rust/master/library/core/src/str/validations.rs
+// encode_utf8: https://github.com/rust-lang/rust/blob/master/library/core/src/char/methods.rs
+
 /// Mask of the value bits of a continuation byte.
 const CONT_MASK: u8 = 0b0011_1111;
 
@@ -8,6 +12,27 @@ const TAG_CONT: u8 = 0b1000_0000;
 const TAG_TWO_B: u8 = 0b1100_0000;
 const TAG_THREE_B: u8 = 0b1110_0000;
 const TAG_FOUR_B: u8 = 0b1111_0000;
+
+/// Returns the initial codepoint accumulator for the first byte.
+/// The first byte is special, only want bottom 5 bits for width 2, 4 bits
+/// for width 3, and 3 bits for width 4.
+#[inline]
+const fn utf8_first_byte(byte: u8, width: u32) -> u32 {
+    (byte & (0x7F >> width)) as u32
+}
+
+/// Returns the value of `ch` updated with continuation byte `byte`.
+#[inline]
+const fn utf8_acc_cont_byte(ch: u32, byte: u8) -> u32 {
+    (ch << 6) | (byte & CONT_MASK) as u32
+}
+
+/// Checks whether the byte is a UTF-8 continuation byte (i.e., starts with the
+/// bits `10`).
+#[inline]
+const fn utf8_is_cont_byte(byte: u8) -> bool {
+    (byte as i8) < -64
+}
 
 #[inline]
 pub const fn encode_utf8(character: char) -> FixedVec<u8, 4> {
@@ -52,29 +77,6 @@ pub const fn encode_utf8(character: char) -> FixedVec<u8, 4> {
     }
 
     bytes
-}
-
-// based on https://raw.githubusercontent.com/rust-lang/rust/master/library/core/src/str/validations.rs
-
-/// Returns the initial codepoint accumulator for the first byte.
-/// The first byte is special, only want bottom 5 bits for width 2, 4 bits
-/// for width 3, and 3 bits for width 4.
-#[inline]
-const fn utf8_first_byte(byte: u8, width: u32) -> u32 {
-    (byte & (0x7F >> width)) as u32
-}
-
-/// Returns the value of `ch` updated with continuation byte `byte`.
-#[inline]
-const fn utf8_acc_cont_byte(ch: u32, byte: u8) -> u32 {
-    (ch << 6) | (byte & CONT_MASK) as u32
-}
-
-/// Checks whether the byte is a UTF-8 continuation byte (i.e., starts with the
-/// bits `10`).
-#[inline]
-const fn utf8_is_cont_byte(byte: u8) -> bool {
-    (byte as i8) < -64
 }
 
 /// Reads the next code point out of a byte iterator (assuming a

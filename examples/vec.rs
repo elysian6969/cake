@@ -22,8 +22,8 @@ fn main() {
     string.push('l');
     string.push('o');
 
-    println!("{string}");
-    println!("{string:?}");
+    println!("string = {string}");
+    println!("string = {string:?}");
 
     println!("{:?}", string.pop());
     println!("{:?}", string.pop());
@@ -32,6 +32,6 @@ fn main() {
     println!("{:?}", string.pop());
     println!("{:?}", string.pop());
 
-    println!("{string}");
-    println!("{string:?}");
+    println!("string = {string}");
+    println!("string = {string:?}");
 }

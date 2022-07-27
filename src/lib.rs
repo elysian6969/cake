@@ -25,7 +25,9 @@
 #![feature(const_pointer_byte_offsets)]
 #![feature(pointer_byte_offsets)]
 // src/macros
+#![feature(const_ptr_sub_ptr)]
 #![feature(const_type_name)]
+#![feature(ptr_sub_ptr)]
 #![feature(type_name_of_val)]
 // src/mem/discrim
 #![feature(const_discriminant)]

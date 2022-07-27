@@ -9,6 +9,14 @@ pub const fn function_impl<T: ?Sized>(function: &T) -> &'static str {
     path
 }
 
+/// Calculates the distance between two pointers, *where it's known that
+/// `field` is equal to or greater than `origin`*. The returned value is in
+/// units of T: the distance in bytes is divided by `mem::size_of::<T>()`.
+#[doc(hidden)]
+pub const unsafe fn offset_of_impl<T: ?Sized, U: ?Sized>(base: *const T, field: *const U) -> usize {
+    field.cast::<u8>().sub_ptr(base.cast::<u8>())
+}
+
 /// Determine the path of the current function.
 #[macro_export]
 macro_rules! function {
@@ -40,6 +48,6 @@ macro_rules! offset_of {
         let base = core::ptr::addr_of!($base);
         let field = core::ptr::addr_of!($base.$field);
 
-        unsafe { field.sub_ptr(base) }
+        unsafe { $crate::macros::offset_of_impl(base, field) }
     }};
 }

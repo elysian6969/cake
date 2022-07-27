@@ -1,4 +1,6 @@
 pub trait Sealed: Sized {}
+
+/// Convert a character of a digit to an integer.
 pub trait FromChar: Sealed {
     fn from_char(character: char, radix: u8) -> Option<Self>;
 }

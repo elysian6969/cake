@@ -101,6 +101,7 @@ pub const fn root(value: i32, root: u32) -> i32 {
     libm::round(libm::pow(value as f64, FRACTION / root as f64)) as i32
 }
 
+/// Convert a character of a digit to an integer.
 #[inline]
 pub const fn from_char<T>(character: char, radix: u8) -> Option<T>
 where
@@ -109,6 +110,7 @@ where
     <T as FromChar>::from_char(character, radix)
 }
 
+/// Convert a string to an integer.
 #[inline]
 pub const fn from_str<T>(string: &str, radix: u8) -> Option<T>
 where

@@ -90,6 +90,8 @@ where
 }
 
 pub trait Sealed: Sized {}
+
+/// Convert a string to an integer.
 pub trait FromStr: Sealed {
     fn from_str(string: &str, radix: u8) -> Option<Self>;
 }

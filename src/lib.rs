@@ -52,6 +52,7 @@
 #![feature(maybe_uninit_uninit_array)]
 // src/num
 #![feature(const_fn_floating_point_arithmetic)]
+#![feature(int_log)]
 #![no_std]
 
 #[doc(hidden)]

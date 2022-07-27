@@ -26,6 +26,11 @@ pub trait Int:
     + One
     + Zero
 {
+    const MIN: Self;
+    const MAX: Self;
+
+    fn log(self, base: Self) -> u32;
+
     #[doc(hidden)]
     fn _cake_base(offset: usize, radix: u8) -> Self;
 
@@ -43,6 +48,13 @@ macro_rules! impl_int {
     ($($ident:ident),*) => { $(
         impl Sealed for $ident {}
         impl const Int for $ident {
+            const MIN: Self = Self::MIN;
+            const MAX: Self = Self::MAX;
+
+            fn log(self, base: Self) -> u32 {
+                self.log(base)
+            }
+
             #[doc(hidden)]
             fn _cake_base(offset: usize, radix: u8) -> Self {
                 (radix as Self).pow(offset as u32)

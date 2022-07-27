@@ -31,11 +31,6 @@ pub const fn is_cache_line_aligned<T>() -> bool {
     Layout::new::<T>().align() == CACHE_LINE_SIZE
 }
 
-#[inline]
-pub const fn bit_size_of<T>() -> usize {
-    Layout::new::<T>().size().saturating_mul(8)
-}
-
 /// Determines whether `T` could be transmuted to `U`.
 #[inline]
 pub const fn is_transmutable<T, U>() -> bool {

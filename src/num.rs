@@ -7,12 +7,19 @@ pub use from_char::FromChar;
 pub use from_str::FromStr;
 pub use identity::{one, zero, One, Zero};
 pub use int::Int;
+pub use signed::Signed;
+pub use to_char::ToChar;
+//pub use to_string::ToString;
 
 mod float;
 mod from_char;
 mod from_str;
 mod identity;
 mod int;
+mod signed;
+mod to_char;
+#[allow(warnings)]
+pub mod to_string;
 
 /// Create a native endian integer value from its representation as a byte array in big endian.
 #[inline]
@@ -95,13 +102,13 @@ where
 
 const FRACTION: f64 = 1.0;
 
-/// Calculates the root `root` of `value`.
+/// Calculates the root of a value.
 #[inline]
 pub const fn root(value: i32, root: u32) -> i32 {
     libm::round(libm::pow(value as f64, FRACTION / root as f64)) as i32
 }
 
-/// Convert a character of a digit to an integer.
+/// Convert a character to a digit.
 #[inline]
 pub const fn from_char<T>(character: char, radix: u8) -> Option<T>
 where
@@ -118,3 +125,21 @@ where
 {
     <T as FromStr>::from_str(string, radix)
 }
+
+/// Convert a digit to a character.
+#[inline]
+pub const fn to_char<T>(digit: T, radix: u8) -> Option<char>
+where
+    T: ~const ToChar,
+{
+    <T as ToChar>::to_char(digit, radix)
+}
+
+/*/// Convert an integer to a string.
+#[inline]
+pub const fn to_string<T>(digit: T, radix: u8) -> ToString::Output
+where
+    T: ~const ToString,
+{
+    <T as ToString>::to_string(digit, radix)
+}*/

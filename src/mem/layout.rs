@@ -1,3 +1,4 @@
+use super::{CACHE_LINE_SIZE, POINTER_SIZE};
 use core::cmp::Ordering;
 use core::{hint, mem};
 
@@ -40,6 +41,26 @@ impl Layout {
     #[inline]
     pub const fn size(self) -> usize {
         self.size
+    }
+
+    #[inline]
+    pub const fn size_bits(self) -> usize {
+        self.size.saturating_mul(8)
+    }
+
+    #[inline]
+    pub const fn is_zero_sized(self) -> bool {
+        self.size == 0
+    }
+
+    #[inline]
+    pub const fn is_pointer_sized(self) -> bool {
+        self.size == POINTER_SIZE
+    }
+
+    #[inline]
+    pub const fn is_cache_line_aligned(self) -> bool {
+        self.align == CACHE_LINE_SIZE
     }
 }
 

@@ -73,12 +73,15 @@ where
 }
 
 #[inline]
-pub const unsafe fn insert_slice_unchecked<T>(dst: &mut [T], src: &[T], index: usize) {
-    //let dst_len = dst.len();
+pub const unsafe fn insert_slice_unchecked<T>(dst: &mut [T], index: usize, src: &[T]) {
+    let dst_len = dst.len();
     let src_len = src.len();
+    let dst1_ptr = dst.as_mut_ptr().add(index + src_len);
+    let dst2_ptr = dst.as_mut_ptr().add(index);
+    let src_ptr = src.as_ptr();
 
-    copy_within_unchecked(dst, index.., index + src_len);
-    ptr::copy_nonoverlapping(src.as_ptr(), dst.as_mut_ptr().add(index), src_len);
+    ptr::copy(dst2_ptr, dst1_ptr, dst_len - index);
+    ptr::copy_nonoverlapping(src_ptr, dst2_ptr, src_len);
 }
 
 #[inline]

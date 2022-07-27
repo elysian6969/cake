@@ -100,7 +100,9 @@ impl<const N: usize> FixedString<N> {
     pub const fn insert(&mut self, index: usize, character: char) {
         let bytes = encode_utf8(character);
 
-        self.bytes.insert_from_slice(index, &bytes);
+        unsafe {
+            self.bytes.insert_slice_unchecked(index, &bytes);
+        }
     }
 }
 

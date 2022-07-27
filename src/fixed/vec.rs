@@ -1,5 +1,5 @@
 use crate::mem::UninitArray;
-use crate::slice::{copy_within, copy_within_unchecked, to_raw_parts, insert_slice_unchecked};
+use crate::slice::{copy_within, copy_within_unchecked, insert_slice_unchecked, to_raw_parts};
 use core::slice::SliceIndex;
 use core::{fmt, ops, ptr, slice};
 
@@ -42,21 +42,6 @@ impl<T, const N: usize> FixedVec<T, N> {
     pub const fn push(&mut self, value: T) {
         self.array[self.len].write(value);
         self.len += 1;
-    }
-
-    #[inline]
-    pub const fn insert_from_slice(&mut self, index: usize, slice: &[T]) {
-        unsafe {
-            let new_len = self.len + slice.len();
-
-            if new_len > N {
-                panic!("overflows capacity");
-            }
-
-            insert_slice_unchecked(self.as_mut_slice(), slice, index);
-
-            self.len = new_len;
-        }
     }
 
     #[inline]
@@ -108,6 +93,12 @@ impl<T, const N: usize> FixedVec<T, N> {
     #[inline]
     pub const fn as_mut_slice(&mut self) -> &mut [T] {
         unsafe { slice::from_raw_parts_mut(self.as_mut_ptr(), self.len()) }
+    }
+
+    #[inline]
+    pub const unsafe fn insert_slice_unchecked(&mut self, index: usize, slice: &[T]) {
+        insert_slice_unchecked(self.as_mut_slice(), index, slice);
+        self.len += slice.len();
     }
 
     #[inline]

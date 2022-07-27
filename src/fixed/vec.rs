@@ -1,4 +1,6 @@
 use crate::mem::UninitArray;
+use crate::slice::{copy_within, copy_within_unchecked, to_raw_parts, insert_slice_unchecked};
+use core::slice::SliceIndex;
 use core::{fmt, ops, ptr, slice};
 
 /// A fixed-capacity vector type.
@@ -43,11 +45,25 @@ impl<T, const N: usize> FixedVec<T, N> {
     }
 
     #[inline]
+    pub const fn insert_from_slice(&mut self, index: usize, slice: &[T]) {
+        unsafe {
+            let new_len = self.len + slice.len();
+
+            if new_len > N {
+                panic!("overflows capacity");
+            }
+
+            insert_slice_unchecked(self.as_mut_slice(), slice, index);
+
+            self.len = new_len;
+        }
+    }
+
+    #[inline]
     pub const fn extend_from_slice(&mut self, slice: &[T]) {
         unsafe {
-            let address = slice.as_ptr();
+            let (address, len) = to_raw_parts(slice);
             let base = self.as_mut_ptr().add(self.len);
-            let len = slice.len();
             let new_len = self.len + len;
 
             if new_len > N {
@@ -92,6 +108,23 @@ impl<T, const N: usize> FixedVec<T, N> {
     #[inline]
     pub const fn as_mut_slice(&mut self) -> &mut [T] {
         unsafe { slice::from_raw_parts_mut(self.as_mut_ptr(), self.len()) }
+    }
+
+    #[inline]
+    pub const fn copy_within<I>(&mut self, src: I, dst: usize)
+    where
+        T: Copy,
+        I: ~const SliceIndex<[T]>,
+    {
+        copy_within(self.as_mut_slice(), src, dst)
+    }
+
+    #[inline]
+    pub const unsafe fn copy_within_unchecked<I>(&mut self, src: I, dst: usize)
+    where
+        I: ~const SliceIndex<[T]>,
+    {
+        copy_within_unchecked(self.as_mut_slice(), src, dst)
     }
 }
 

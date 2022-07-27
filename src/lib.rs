@@ -21,6 +21,8 @@
 #![feature(const_convert)]
 #![feature(const_str_from_utf8_unchecked_mut)]
 #![feature(const_try)]
+// src/fixed/vec
+#![feature(const_ptr_write)]
 // src/compress
 #![feature(const_pointer_byte_offsets)]
 #![feature(pointer_byte_offsets)]
@@ -37,8 +39,7 @@
 // src/mem/layout
 #![feature(const_align_of_val)]
 #![feature(const_align_of_val_raw)]
-// wait for tomorrow's nightly
-//#![feature(const_cmp)]
+#![feature(const_cmp)]
 #![feature(const_size_of_val)]
 #![feature(const_size_of_val_raw)]
 #![feature(layout_for_ptr)]

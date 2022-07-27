@@ -1,7 +1,6 @@
 use super::FixedVec;
 use crate::char::{encode_utf8, next_code_point, next_code_point_reverse};
-use crate::slice;
-use core::{fmt, ops, ptr, str};
+use core::{fmt, ops, str};
 
 /// A fixed-capacity string type.
 pub struct FixedString<const N: usize> {
@@ -87,8 +86,9 @@ impl<const N: usize> FixedString<N> {
             let character = unsafe { next_code_point(prefix.as_bytes())? };
             let len_utf8 = character.len_utf8();
 
+            self.bytes.copy_within((index + len_utf8).., index);
+
             unsafe {
-                slice::copy_within_unchecked(self.as_mut_bytes(), (index + len_utf8).., index);
                 self.bytes.set_len(self.len() - len_utf8);
             }
 
@@ -98,14 +98,9 @@ impl<const N: usize> FixedString<N> {
 
     #[inline]
     pub const fn insert(&mut self, index: usize, character: char) {
-        let _prefix = &self[index..];
         let bytes = encode_utf8(character);
-        let len_utf8 = bytes.len();
 
-        unsafe {
-            slice::copy_within_unchecked(self.as_mut_bytes(), index.., index + len_utf8);
-            ptr::copy_nonoverlapping(bytes.as_ptr(), self.as_mut_ptr().add(index), len_utf8);
-        }
+        self.bytes.insert_from_slice(index, &bytes);
     }
 }
 

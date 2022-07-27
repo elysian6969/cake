@@ -177,3 +177,29 @@ pub(crate) const unsafe fn next_code_point_reverse(bytes: &[u8]) -> Option<char>
 
     Some(char::from_u32_unchecked(code))
 }
+
+pub(crate) struct Chars<'a> {
+    bytes: &'a [u8],
+}
+
+impl<'a> Chars<'a> {
+    #[inline]
+    pub const fn new(string: &'a str) -> Self {
+        let bytes = string.as_bytes();
+
+        Self { bytes }
+    }
+
+    #[inline]
+    pub const fn next(&mut self) -> Option<char> {
+        if self.bytes.is_empty() {
+            return None;
+        }
+
+        let character = unsafe { next_code_point(self.bytes)? };
+
+        self.bytes = unsafe { self.bytes.get_unchecked(character.len_utf8()..) };
+
+        Some(character)
+    }
+}

@@ -3,81 +3,16 @@ use crate::mem::Layout;
 use crate::traits::{Assert, True};
 
 pub use float::Float;
+pub use from_char::FromChar;
+pub use from_str::FromStr;
+pub use identity::{one, zero, One, Zero};
 pub use int::Int;
 
-mod float {
-    pub trait Sealed: Sized {}
-
-    /// A floating point integer.
-    pub trait Float: Sealed {}
-
-    macro_rules! impl_float {
-        ($($ident:ident),*) => {
-            $(
-                impl Sealed for $ident {}
-                impl Float for $ident {}
-            )*
-        }
-    }
-
-    impl_float! { f32, f64 }
-}
-
-mod int {
-    use crate::mem::Layout;
-
-    pub trait Sealed: Sized {}
-
-    /// An integer.
-    pub trait Int: Sealed {
-        #[doc(hidden)]
-        fn _cake_from_be_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self;
-
-        #[doc(hidden)]
-        fn _cake_from_le_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self;
-
-        #[doc(hidden)]
-        fn _cake_from_ne_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self;
-    }
-
-    macro_rules! impl_int {
-        ($($ident:ident),*) => {
-            $(
-                impl Sealed for $ident {}
-                impl const Int for $ident {
-                    #[inline]
-                    fn _cake_from_be_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self
-                    where
-                        [(); Layout::new::<Self>().size()]:,
-                    {
-                        Self::from_be_bytes(bytes)
-                    }
-
-                    #[inline]
-                    fn _cake_from_le_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self
-                    where
-                        [(); Layout::new::<Self>().size()]:,
-                    {
-                        Self::from_le_bytes(bytes)
-                    }
-
-                    #[inline]
-                    fn _cake_from_ne_bytes(bytes: [u8; Layout::new::<Self>().size()]) -> Self
-                    where
-                        [(); Layout::new::<Self>().size()]:,
-                    {
-                        Self::from_ne_bytes(bytes)
-                    }
-                }
-            )*
-        }
-    }
-
-    impl_int! {
-        i8, i16, i32, i64, i128, isize,
-        u8, u16, u32, u64, u128, usize
-    }
-}
+mod float;
+mod from_char;
+mod from_str;
+mod identity;
+mod int;
 
 /// Create a native endian integer value from its representation as a byte array in big endian.
 #[inline]
@@ -164,4 +99,20 @@ const FRACTION: f64 = 1.0;
 #[inline]
 pub const fn root(value: i32, root: u32) -> i32 {
     libm::round(libm::pow(value as f64, FRACTION / root as f64)) as i32
+}
+
+#[inline]
+pub const fn from_char<T>(character: char, radix: u8) -> Option<T>
+where
+    T: ~const FromChar,
+{
+    <T as FromChar>::from_char(character, radix)
+}
+
+#[inline]
+pub const fn from_str<T>(string: &str, radix: u8) -> Option<T>
+where
+    T: ~const FromStr,
+{
+    <T as FromStr>::from_str(string, radix)
 }

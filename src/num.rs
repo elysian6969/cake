@@ -140,6 +140,20 @@ where
     <T as ToChar>::to_char(digit, radix)
 }
 
+/// Convert a digit to a character.
+///
+/// # Safety
+///
+/// `digit` must be a valid digit.
+/// `radix` must be between `2` and `32`.
+#[inline]
+pub const unsafe fn to_char_unchecked<T>(digit: T, radix: u8) -> char
+where
+    T: ~const ToChar,
+{
+    to_char(digit, radix).unwrap_unchecked()
+}
+
 #[inline]
 pub const fn div_rem<T>(value: T, denom: T) -> (T, T)
 where

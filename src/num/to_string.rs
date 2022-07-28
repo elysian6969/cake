@@ -21,7 +21,7 @@ where
 {
     while !num::is_zero(value) {
         let (div, rem) = num::div_rem(value, num::cast(radix));
-        let character = unsafe { num::to_char(rem, radix).unwrap_unchecked() };
+        let character = unsafe { num::to_char_unchecked(rem, radix) };
 
         string.insert(0, character);
 

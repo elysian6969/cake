@@ -1,7 +1,7 @@
 #![allow(incomplete_features)]
 #![allow(unsafe_op_in_unsafe_fn)]
 #![allow(unused_unsafe)]
-//#![deny(warnings)]
+#![deny(warnings)]
 // generic
 #![feature(const_mut_refs)]
 #![feature(const_option_ext)]

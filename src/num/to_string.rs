@@ -1,152 +1,64 @@
-use super::{Int, One, Signed, ToChar, Zero};
-use crate::char::Chars;
 use crate::fixed::FixedString;
-use crate::mem::Layout;
-use core::ops::{Add, AddAssign, DivAssign, Mul, Neg, Rem};
+use crate::num;
+use crate::num::{As, AsUnsigned, Int, One, Signed, ToChar, Unsigned, Zero};
+use core::ops::{Add, Div, Rem};
+pub use radix::{len, max_len, Radix};
+
+mod radix;
 
 #[inline]
-pub const fn signed_len<T>(radix: u8) -> usize
+const fn format_digits<T, const N: usize>(string: &mut FixedString<N>, mut value: T, radix: u8)
 where
-    T: ~const FromRadix,
-    T: ~const Int,
-    T: ~const Signed,
+    T: Copy,
     T: ~const Add<Output = T>,
+    T: ~const Div<Output = T>,
     T: ~const One,
-{
-    // abs(min) would overflow
-    let min = <T as Int>::MIN + super::one();
-    let abs = <T as Signed>::abs(min);
-    let log = <T as Int>::log(abs, <T as FromRadix>::from_radix(radix));
-
-    // this also includes `-`
-    log.saturating_add(3) as usize
-}
-
-#[inline]
-pub const fn unsigned_len<T>(radix: u8) -> usize
-where
-    T: ~const FromRadix,
-    T: ~const Int,
-    T: ~const One,
-{
-    let max = <T as Int>::MAX;
-    let log = <T as Int>::log(max, <T as FromRadix>::from_radix(radix));
-
-    log.saturating_add(1) as usize
-}
-
-pub trait Radix: Copy + Sized {
-    const MAX_LEN: usize;
-
-    fn len<const RADIX: u8>() -> usize;
-}
-
-#[inline]
-pub const fn len<T, const RADIX: u8>() -> usize
-where
-    T: ~const Radix,
-{
-    <T as Radix>::len::<RADIX>()
-}
-
-#[inline]
-pub const fn max_len<T>() -> usize
-where
-    T: Radix,
-{
-    <T as Radix>::MAX_LEN
-}
-
-macro_rules! impl_signed_radix {
-    ($($ident:ident),*) => { $(
-        impl const Radix for $ident {
-            const MAX_LEN: usize = signed_len::<Self>(2);
-
-            #[inline]
-            fn len<const RADIX: u8>() -> usize {
-                signed_len::<Self>(RADIX)
-            }
-        }
-    )* }
-}
-
-macro_rules! impl_unsigned_radix {
-    ($($ident:ident),*) => { $(
-        impl const Radix for $ident {
-            const MAX_LEN: usize = unsigned_len::<Self>(2);
-
-            #[inline]
-            fn len<const RADIX: u8>() -> usize {
-                unsigned_len::<Self>(RADIX)
-            }
-        }
-    )* }
-}
-
-impl_signed_radix! { i8, i16, i32, i64, i128, isize }
-impl_unsigned_radix! { u8, u16, u32, u64, u128, usize }
-
-pub trait FromRadix: Copy + Sized {
-    fn from_radix(radix: u8) -> Self;
-}
-
-macro_rules! impl_from_radix {
-    ($($ident:ident),*) => { $(
-        impl const FromRadix for $ident {
-            #[inline]
-            fn from_radix(radix: u8) -> Self {
-                radix as Self
-            }
-        }
-    )* }
-}
-
-#[inline]
-pub const fn from_radix<T>(radix: u8) -> T
-where
-    T: ~const FromRadix,
-{
-    <T as FromRadix>::from_radix(radix)
-}
-
-impl_from_radix! {
-    i8, i16, i32, i64, i128, isize,
-    u8, u16, u32, u64, u128, usize
-}
-
-#[inline]
-pub const fn signed_to_string<T, const RADIX: u8>(int: T) -> FixedString<{ len::<T, RADIX>() }>
-where
-    T: ~const Add<Output = T>,
-    T: ~const AddAssign,
-    T: ~const DivAssign,
-    T: ~const FromRadix,
-    T: ~const Radix,
-    T: ~const Int,
-    T: ~const Mul<Output = T>,
-    T: ~const Neg<Output = T>,
-    T: ~const One,
-    T: ~const PartialEq,
     T: ~const Rem<Output = T>,
-    T: ~const Signed,
     T: ~const ToChar,
+    T: ~const Unsigned,
     T: ~const Zero,
+    u8: ~const As<T>,
 {
-    let mut string = FixedString::<{ len::<T, RADIX>() }>::new();
-    let is_negative = <T as Signed>::is_negative(int);
-    let mut digit = <T as Signed>::abs(int);
-
-    while !super::is_zero(digit) {
-        let character = digit % from_radix(RADIX);
-
-        digit /= from_radix(RADIX);
-
-        let character = unsafe { super::to_char(character, RADIX).unwrap_unchecked() };
+    while !num::is_zero(value) {
+        let (div, rem) = num::div_rem(value, num::cast(radix));
+        let character = unsafe { num::to_char(rem, radix).unwrap_unchecked() };
 
         string.insert(0, character);
-    }
 
-    if is_negative && from_radix::<T>(RADIX) != super::one::<T>() + super::one() {
+        value = div;
+    }
+}
+
+#[inline]
+const fn to_string_signed<T, U, const RADIX: u8>(value: T) -> FixedString<{ len::<T, RADIX>() }>
+where
+    T: ~const AsUnsigned<Output = U>,
+    T: ~const Int,
+    T: ~const PartialEq,
+    T: ~const Radix,
+    T: ~const Signed,
+    U: Copy,
+    U: ~const Add<Output = U>,
+    U: ~const Div<Output = U>,
+    U: ~const One,
+    U: ~const Rem<Output = U>,
+    U: ~const ToChar,
+    U: ~const Unsigned,
+    U: ~const Zero,
+    u8: ~const As<U>,
+{
+    let mut string = FixedString::<{ len::<T, RADIX>() }>::new();
+    let is_negative = <T as Signed>::is_negative(value);
+    // handle T::MIN, as T::MIN.abs() would overflow
+    let value = if value == <T as Int>::MIN {
+        num::as_unsigned(value)
+    } else {
+        num::as_unsigned(<T as Signed>::abs(value))
+    };
+
+    format_digits(&mut string, value, RADIX);
+
+    if is_negative && RADIX != 2 {
         string.insert(0, '-');
     }
 
@@ -154,38 +66,35 @@ where
 }
 
 #[inline]
-pub const fn dyn_signed_to_string<T>(int: T, radix: u8) -> FixedString<{ max_len::<T>() }>
+const fn to_dyn_string_signed<T, U>(value: T, radix: u8) -> FixedString<{ max_len::<T>() }>
 where
-    T: ~const Add<Output = T>,
-    T: ~const AddAssign,
-    T: ~const DivAssign,
-    T: ~const FromRadix,
-    T: ~const Radix,
+    T: ~const AsUnsigned<Output = U>,
     T: ~const Int,
-    T: ~const Mul<Output = T>,
-    T: ~const Neg<Output = T>,
-    T: ~const One,
     T: ~const PartialEq,
-    T: ~const Rem<Output = T>,
+    T: ~const Radix,
     T: ~const Signed,
-    T: ~const ToChar,
-    T: ~const Zero,
+    U: Copy,
+    U: ~const Add<Output = U>,
+    U: ~const Div<Output = U>,
+    U: ~const One,
+    U: ~const Rem<Output = U>,
+    U: ~const ToChar,
+    U: ~const Unsigned,
+    U: ~const Zero,
+    u8: ~const As<U>,
 {
     let mut string = FixedString::<{ max_len::<T>() }>::new();
-    let is_negative = <T as Signed>::is_negative(int);
-    let mut digit = <T as Signed>::abs(int);
+    let is_negative = <T as Signed>::is_negative(value);
+    // handle T::MIN, as T::MIN.abs() would overflow
+    let value = if value == <T as Int>::MIN {
+        num::as_unsigned(value)
+    } else {
+        num::as_unsigned(<T as Signed>::abs(value))
+    };
 
-    while !super::is_zero(digit) {
-        let character = digit % from_radix(radix);
+    format_digits(&mut string, value, radix);
 
-        digit /= from_radix(radix);
-
-        let character = unsafe { super::to_char(character, radix).unwrap_unchecked() };
-
-        string.insert(0, character);
-    }
-
-    if is_negative && from_radix::<T>(radix) != super::one::<T>() + super::one() {
+    if is_negative && radix != 2 {
         string.insert(0, '-');
     }
 
@@ -193,71 +102,49 @@ where
 }
 
 #[inline]
-pub const fn unsigned_to_string<T, const RADIX: u8>(int: T) -> FixedString<{ len::<T, RADIX>() }>
+const fn to_string_unsigned<T, const RADIX: u8>(value: T) -> FixedString<{ len::<T, RADIX>() }>
 where
+    T: Copy,
     T: ~const Add<Output = T>,
-    T: ~const AddAssign,
-    T: ~const DivAssign,
-    T: ~const FromRadix,
-    T: ~const Radix,
-    T: ~const Int,
-    T: ~const Mul<Output = T>,
+    T: ~const Div<Output = T>,
     T: ~const One,
+    T: ~const Radix,
     T: ~const Rem<Output = T>,
     T: ~const ToChar,
+    T: ~const Unsigned,
     T: ~const Zero,
+    u8: ~const As<T>,
 {
     let mut string = FixedString::<{ len::<T, RADIX>() }>::new();
-    let mut digit = int;
 
-    while !super::is_zero(digit) {
-        let character = digit % from_radix(RADIX);
-
-        digit /= from_radix(RADIX);
-
-        let character = unsafe { super::to_char(character, RADIX).unwrap_unchecked() };
-
-        string.insert(0, character);
-    }
+    format_digits(&mut string, value, RADIX);
 
     string
 }
 
 #[inline]
-pub const fn dyn_unsigned_to_string<T>(int: T, radix: u8) -> FixedString<{ max_len::<T>() }>
+const fn to_dyn_string_unsigned<T>(value: T, radix: u8) -> FixedString<{ max_len::<T>() }>
 where
+    T: Copy,
     T: ~const Add<Output = T>,
-    T: ~const AddAssign,
-    T: ~const DivAssign,
-    T: ~const FromRadix,
-    T: ~const Radix,
-    T: ~const Int,
-    T: ~const Mul<Output = T>,
+    T: ~const Div<Output = T>,
     T: ~const One,
+    T: ~const Radix,
     T: ~const Rem<Output = T>,
     T: ~const ToChar,
+    T: ~const Unsigned,
     T: ~const Zero,
+    u8: ~const As<T>,
 {
     let mut string = FixedString::<{ max_len::<T>() }>::new();
-    let mut digit = int;
 
-    while !super::is_zero(digit) {
-        let character = digit % from_radix(radix);
-
-        digit /= from_radix(radix);
-
-        let character = unsafe { super::to_char(character, radix).unwrap_unchecked() };
-
-        string.insert(0, character);
-    }
+    format_digits(&mut string, value, radix);
 
     string
 }
-
-pub trait Sealed: Sized {}
 
 /// Convert a string to an integer.
-pub trait ToString: Radix + Sealed {
+pub trait ToString: Radix {
     fn to_string<const RADIX: u8>(self) -> FixedString<{ len::<Self, RADIX>() }>
     where
         Self: ~const Radix;
@@ -267,19 +154,18 @@ pub trait ToString: Radix + Sealed {
 
 macro_rules! impl_signed {
     ($($ident:ident),*) => { $(
-        impl Sealed for $ident {}
         impl const ToString for $ident {
             #[inline]
             fn to_string<const RADIX: u8>(self) -> FixedString<{ len::<Self, RADIX>() }>
             where
                 Self: ~const Radix,
             {
-                signed_to_string::<_, RADIX>(self)
+                to_string_signed::<Self, _, RADIX>(self)
             }
 
             #[inline]
             fn to_dyn_string(self, radix: u8) -> FixedString<{ max_len::<Self>() }> {
-                dyn_signed_to_string::<_>(self, radix)
+                to_dyn_string_signed::<Self, _>(self, radix)
             }
         }
     )* }
@@ -287,19 +173,18 @@ macro_rules! impl_signed {
 
 macro_rules! impl_unsigned {
     ($($ident:ident),*) => { $(
-        impl Sealed for $ident {}
         impl const ToString for $ident {
             #[inline]
             fn to_string<const RADIX: u8>(self) -> FixedString<{ len::<Self, RADIX>() }>
             where
                 Self: ~const Radix,
             {
-                unsigned_to_string::<_, RADIX>(self)
+                to_string_unsigned::<Self, RADIX>(self)
             }
 
             #[inline]
             fn to_dyn_string(self, radix: u8) -> FixedString<{ max_len::<Self>() }> {
-                dyn_unsigned_to_string::<_>(self, radix)
+                to_dyn_string_unsigned::<Self>(self, radix)
             }
         }
     )* }

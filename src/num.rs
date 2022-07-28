@@ -2,7 +2,9 @@ use crate::fixed::FixedString;
 use crate::mem;
 use crate::mem::Layout;
 use crate::traits::{Assert, True};
+use core::ops::{Div, Rem};
 
+pub use as_cast::{as_unsigned, cast, As, AsUnsigned};
 pub use float::Float;
 pub use from_char::FromChar;
 pub use from_str::FromStr;
@@ -10,8 +12,10 @@ pub use identity::{is_one, is_zero, one, zero, One, Zero};
 pub use int::Int;
 pub use signed::Signed;
 pub use to_char::ToChar;
-pub use to_string::{len, max_len, FromRadix, Radix, ToString};
+pub use to_string::{len, max_len, Radix, ToString};
+pub use unsigned::Unsigned;
 
+mod as_cast;
 mod float;
 mod from_char;
 mod from_str;
@@ -19,8 +23,8 @@ mod identity;
 mod int;
 mod signed;
 mod to_char;
-#[allow(warnings)]
-pub mod to_string;
+mod to_string;
+mod unsigned;
 
 /// Create a native endian integer value from its representation as a byte array in big endian.
 #[inline]
@@ -134,6 +138,16 @@ where
     T: ~const ToChar,
 {
     <T as ToChar>::to_char(digit, radix)
+}
+
+#[inline]
+pub const fn div_rem<T>(value: T, denom: T) -> (T, T)
+where
+    T: Copy,
+    T: ~const Div<Output = T>,
+    T: ~const Rem<Output = T>,
+{
+    (value / denom, value % denom)
 }
 
 /// Convert an integer to a string.

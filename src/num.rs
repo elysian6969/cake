@@ -1,3 +1,4 @@
+use crate::fixed::FixedString;
 use crate::mem;
 use crate::mem::Layout;
 use crate::traits::{Assert, True};
@@ -5,11 +6,11 @@ use crate::traits::{Assert, True};
 pub use float::Float;
 pub use from_char::FromChar;
 pub use from_str::FromStr;
-pub use identity::{one, zero, One, Zero};
+pub use identity::{is_one, is_zero, one, zero, One, Zero};
 pub use int::Int;
 pub use signed::Signed;
 pub use to_char::ToChar;
-//pub use to_string::ToString;
+pub use to_string::{len, max_len, FromRadix, Radix, ToString};
 
 mod float;
 mod from_char;
@@ -135,11 +136,21 @@ where
     <T as ToChar>::to_char(digit, radix)
 }
 
-/*/// Convert an integer to a string.
+/// Convert an integer to a string.
 #[inline]
-pub const fn to_string<T>(digit: T, radix: u8) -> ToString::Output
+pub const fn to_string<T, const RADIX: u8>(digit: T) -> FixedString<{ len::<T, RADIX>() }>
+where
+    T: ~const ToString,
+    T: ~const Radix,
+{
+    <T as ToString>::to_string::<RADIX>(digit)
+}
+
+/// Convert an integer to a string.
+#[inline]
+pub const fn to_dyn_string<T>(digit: T, radix: u8) -> FixedString<{ max_len::<T>() }>
 where
     T: ~const ToString,
 {
-    <T as ToString>::to_string(digit, radix)
-}*/
+    <T as ToString>::to_dyn_string(digit, radix)
+}

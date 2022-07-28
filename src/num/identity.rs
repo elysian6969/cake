@@ -84,3 +84,21 @@ where
 {
     Zero::zero()
 }
+
+/// Returns `true` if equal to `1`.
+#[inline]
+pub const fn is_one<T>(value: T) -> bool
+where
+    T: ~const One,
+{
+    value.is_one()
+}
+
+/// Returns `true` if equal to `0`.
+#[inline]
+pub const fn is_zero<T>(value: T) -> bool
+where
+    T: ~const Zero,
+{
+    value.is_zero()
+}

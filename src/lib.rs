@@ -61,6 +61,7 @@ pub mod macros;
 
 pub mod array;
 pub mod char;
+#[cfg(target_pointer_width = "64")]
 pub mod compress;
 pub mod ffi;
 pub mod fixed;

@@ -73,37 +73,61 @@ macro_rules! impl_call {
     (
         $syscall:literal;
         ($($element:ident,)*);
+        ($id:ident, $args:ident, $result:ident);
         $($asm:tt)*
     ) => {
-        impl<$($element,)*> Call<($($element,)*)> for usize
+        impl Call<($($element,)*)> for usize
         where
             $($element: Arg,)*
         {
             type Output = usize;
 
             #[inline(always)]
-            unsafe fn exec(self, args: ($($element,)*)) -> Self::Output {
-                let id: usize = self;
-                let result: usize;
-
+            unsafe fn exec(self, $args: ($($element,)*)) -> Self::Output {
+                let $id = self;
+                let $result: usize;
+                
                 asm!(
                     $syscall,
                     $($asm)*
                     options(nostack),
                 );
 
-                result
+                $result
             }
         }
     }
 }
 
+#[cfg(target_arch = "aarch64")]
+macro_rules! impl_calls {
+    ($($ident:ident,)*) => { $(
+        impl_call! {
+            "svc 0";
+            ($ident,);
+            (id, args, result);
+            in("x8") id,
+            inout("x0") args.0 as usize => result,
+        }
+    )* };
+}
+
+impl_calls! { i16, i32, u16, u32, }
+
+/*#[cfg(target_arch = "x86_64")]
 impl_call! {
     "syscall";
     (A,);
     inout("rax") id => result,
     out("r11") _,
     out("rcx") _,
+}*/
+
+pub unsafe fn call<Args, Output>(id: usize, args: Args) -> <usize as Call<Args>>::Output
+where
+    usize: Call<Args, Output = Output>,
+{
+    <usize as Call<Args>>::exec(id, args)
 }
 
 /*macro_rules! impl_calls {

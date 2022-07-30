@@ -6,7 +6,6 @@ pub mod abi;
 mod pad;
 
 #[allow(warnings)]
-#[cfg(target_arch = "x86_64")]
 pub mod sysv;
 
 mod sealed {

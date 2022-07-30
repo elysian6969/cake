@@ -1,11 +1,18 @@
-use cake::ffi::sysv::SysVSignature;
+use cake::ffi::sysv;
+use cake::ffi::sysv::{Call, Arg};
 
-fn foo(_x: usize, _y: usize) {}
+use core::arch::asm;
+
+unsafe fn foo<A: Arg>(a: A) {}
+
+cake::impl_call! {
+    (A,);
+    "syscall";
+    inout("rax") id => result,
+    out("r11") _,
+    out("rcx") _,
+}
 
 fn main() {
-    unsafe {
-        let foo: fn(usize, usize) = foo;
-
-        SysVSignature::call(foo, 253_usize, (1_usize,));
-    }
+    unsafe { foo(5); }
 }
